@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AZ-104 対策クイズ</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+    background: linear-gradient(135deg, #f0f4f9 0%, #e3ecf7 100%);
+    color: #1a1a1a;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  header h1 {
+    margin: 0 0 4px;
+    font-size: 1.4rem;
+    color: #0a4d8a;
+    letter-spacing: 0.02em;
+  }
+  .progress-wrap {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #555;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 8px;
+    background: #d8e2ee;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2c7bd1, #4ca5e8);
+    transition: width 0.35s ease;
+  }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(20, 50, 90, 0.08);
+    padding: 28px 26px;
+    margin-bottom: 18px;
+  }
+  .chapter-tag {
+    display: inline-block;
+    background: #e8f1fb;
+    color: #0a4d8a;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .question-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    white-space: pre-wrap;
+    margin-bottom: 20px;
+  }
+  .multi-badge {
+    display: inline-block;
+    background: #fff3d6;
+    color: #8a5a00;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 2px solid #e1e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #fafbfd;
+  }
+  .choice:hover:not(.locked) {
+    border-color: #4ca5e8;
+    background: #f3f8fd;
+  }
+  .choice input {
+    margin-top: 4px;
+    flex-shrink: 0;
+    accent-color: #2c7bd1;
+    width: 16px;
+    height: 16px;
+  }
+  .choice-key {
+    font-weight: 700;
+    color: #0a4d8a;
+    flex-shrink: 0;
+    min-width: 18px;
+  }
+  .choice-text {
+    flex: 1;
+    color: #2c2c2c;
+  }
+  .choice.locked { cursor: default; }
+  .choice.correct {
+    border-color: #2e9956;
+    background: #e8f7ee;
+  }
+  .choice.incorrect {
+    border-color: #d33b3b;
+    background: #fbecec;
+  }
+  .choice.correct .choice-key { color: #2e9956; }
+  .choice.incorrect .choice-key { color: #d33b3b; }
+  .submit-btn, .next-btn, .primary-btn, .secondary-btn {
+    margin-top: 22px;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .submit-btn, .primary-btn {
+    background: linear-gradient(135deg, #2c7bd1, #1a5ca8);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(44, 123, 209, 0.3);
+  }
+  .submit-btn:hover:not(:disabled), .primary-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(44, 123, 209, 0.4);
+  }
+  .submit-btn:disabled {
+    background: #c0ccd9;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .next-btn {
+    background: #2e9956;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(46, 153, 86, 0.3);
+  }
+  .next-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(46, 153, 86, 0.4);
+  }
+  .secondary-btn {
+    background: #fff;
+    color: #0a4d8a;
+    border: 2px solid #0a4d8a;
+  }
+  .secondary-btn:hover {
+    background: #f0f6fc;
+  }
+  .feedback {
+    margin-top: 22px;
+    padding: 18px 20px;
+    border-radius: 10px;
+    border-left: 5px solid;
+  }
+  .feedback.correct {
+    background: #e8f7ee;
+    border-color: #2e9956;
+  }
+  .feedback.incorrect {
+    background: #fbecec;
+    border-color: #d33b3b;
+  }
+  .feedback-title {
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 1rem;
+  }
+  .feedback.correct .feedback-title { color: #2e9956; }
+  .feedback.incorrect .feedback-title { color: #d33b3b; }
+  .feedback-answer {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  .feedback-explanation {
+    color: #333;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  /* Summary page */
+  .summary-score {
+    text-align: center;
+    padding: 30px 20px 26px;
+  }
+  .score-percent {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, #2c7bd1, #1a5ca8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 6px;
+  }
+  .score-detail {
+    color: #555;
+    font-size: 1rem;
+    margin-bottom: 22px;
+  }
+  .summary-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .wrong-section h2 {
+    margin: 30px 0 14px;
+    font-size: 1.1rem;
+    color: #0a4d8a;
+    border-bottom: 2px solid #d8e2ee;
+    padding-bottom: 8px;
+  }
+  .wrong-item {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(20, 50, 90, 0.06);
+    border-left: 4px solid #d33b3b;
+  }
+  .wrong-q-meta {
+    font-size: 0.78rem;
+    color: #888;
+    margin-bottom: 6px;
+  }
+  .wrong-q-text {
+    font-weight: 600;
+    margin-bottom: 12px;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+  }
+  .wrong-choice {
+    padding: 6px 10px;
+    margin: 4px 0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  .wrong-choice.correct {
+    background: #e8f7ee;
+    color: #1b6a3b;
+  }
+  .wrong-choice.user-wrong {
+    background: #fbecec;
+    color: #8a2828;
+    text-decoration: line-through;
+  }
+  .wrong-choice.normal {
+    color: #555;
+  }
+  .wrong-answers-line {
+    font-size: 0.88rem;
+    margin: 8px 0 10px;
+    color: #555;
+  }
+  .wrong-answers-line strong { color: #2e9956; }
+  .wrong-user-line { color: #d33b3b; }
+  .wrong-explanation {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #f7f9fc;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: #333;
+    line-height: 1.6;
+  }
+  .empty-wrong {
+    text-align: center;
+    padding: 30px;
+    color: #2e9956;
+    font-weight: 600;
+  }
+  @media (max-width: 600px) {
+    .container { padding: 16px 14px 60px; }
+    .card { padding: 22px 18px; }
+    .score-percent { font-size: 3rem; }
+    .question-text { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container" id="app"></div>
+
+<script>
+const QUIZ_DATA = [{"id":0,"chapter":"第1章","qNum":1,"question":"クラウドコンピューティングにおけるサービスモデルのうち、Microsoft Azureで提供されるサービスはどのサービスモデルに分類されますか(2つ選択)。","choices":[{"key":"A","text":"SaaS"},{"key":"B","text":"PaaS"},{"key":"C","text":"IaaS"},{"key":"D","text":"BaaS"}],"answer":["B","C"],"isMulti":true,"explanation":"Microsoft Azureは、IaaSとPaaSを提供するクラウドサービスです。BaaSとは「Backend as a Service」の略で、モバイルアプリなどのバックエンド部分を提供するサービスを指す言葉として使われます。これは、クラウドコンピューティングのサービスモデルを表すものではありません。"},{"id":1,"chapter":"第1章","qNum":2,"question":"リージョンの説明として、適切なものはどれですか。","choices":[{"key":"A","text":"リソースをグループ化したもの"},{"key":"B","text":"Azureを利用するために必要な契約"},{"key":"C","text":"作成可能なリソースの数などの制限"},{"key":"D","text":"Azureのデータセンターのコレクション"}],"answer":["D"],"isMulti":false,"explanation":"リージョンとは、Azureのデータセンターのコレクションです。「東日本」や「西日本」などのように、世界各地にあるデータセンターを地区ごとにグループ化したものがリージョンです。リソースをグループ化したものは、リソースグループです。Azureを利用するために必要な契約は、サブスクリプションです。作成可能なリソースの数などの制限は、クォータです。"},{"id":2,"chapter":"第1章","qNum":3,"question":"リージョンの特徴に関する説明として、誤っているものは次のうちどれですか。","choices":[{"key":"A","text":"冗長構成などのためのリージョンペアが決まっている"},{"key":"B","text":"一部のリージョンを除き、利用者は任意のリージョンを自由に選択できる"},{"key":"C","text":"どのリージョンでも、同じサービスおよび構成オプションを使用することができる"},{"key":"D","text":"国によっては2つ以上のリージョンが存在する場合がある"}],"answer":["C"],"isMulti":false,"explanation":"一部のサービスや構成オプションは、特定のリージョンのみに限定されています。例えば、仮想マシンの可用性オプションはリージョンによって選択可能なものが異なります。"},{"id":3,"chapter":"第1章","qNum":4,"question":"複数のサブスクリプションを持つメリットの説明として、誤っているものは次のうちどれですか。","choices":[{"key":"A","text":"長期的にAzureを低料金で使用できる"},{"key":"B","text":"リソースのアクセス権を分離できる"},{"key":"C","text":"クォータの回避やクォータ管理の分離ができる"},{"key":"D","text":"請求書を分割できる"}],"answer":["A"],"isMulti":false,"explanation":"複数のサブスクリプションを持つことはできますが、それによって長期的にAzureを低料金で使用できるわけではありません。"},{"id":4,"chapter":"第1章","qNum":5,"question":"リソースプロバイダーに関する説明として、誤っているものは次のうちどれですか。","choices":[{"key":"A","text":"既定では多くのリソースプロバイダーは登録されていない"},{"key":"B","text":"Microsoft.Computeは、仮想マシンリソースの操作を提供する"},{"key":"C","text":"すべてのリソースプロバイダーは、リソースの操作時に自動的に登録される"},{"key":"D","text":"Azure Resource Managerに送られた操作要求は、リソースプロバイダーに転送される"}],"answer":["C"],"isMulti":false,"explanation":"多くのリソースプロバイダーは、リソースを初めて操作する際に自動的に登録されます。ただし、一部のリソースに関しては、作成時にリソースプロバイダーの自動的な登録が行われないものがあり、その場合には事前に明示的な登録が必要です。"},{"id":5,"chapter":"第1章","qNum":6,"question":"リソースグループに関する説明として、適切なものは次のうちどれですか。","choices":[{"key":"A","text":"1つのリソースグループには、同じ種類のリソースのみ含めることが可能"},{"key":"B","text":"1つのリソースグループには、様々なリージョンのリソースを含めることが可能"},{"key":"C","text":"1つのリソースを、複数のリソースグループに含めることが可能"},{"key":"D","text":"どのリソースグループにも含めないリソースを作成することが可能"}],"answer":["B"],"isMulti":false,"explanation":"1つのリソースグループには、様々な種類のリソースを含めることも、様々なリージョンのリソースを含めることも可能です。どのリソースグループにも入らないリソースを作成することはできません。また、1つのリソースを複数のリソースグループに追加することもできません。1つのリソースは必ず1つのリソースグループの配下で管理されます。"},{"id":6,"chapter":"第1章","qNum":7,"question":"リソースグループの操作に関する説明として、適切なものは次のうちどれですか。","choices":[{"key":"A","text":"リソースグループの名前は、後から変更することができる"},{"key":"B","text":"あるリソースグループ内のリソースを別のリソースグループに移動できる"},{"key":"C","text":"別のリソースグループへの移動中は、含まれるリソースが停止する"},{"key":"D","text":"リソースグループを削除しても、そのリソースグループ内のリソースは削除されない"}],"answer":["B"],"isMulti":false,"explanation":"リソースグループ内のリソースは、別のリソースグループに移動することができます。移動操作は、Azureポータルや、Azure PowerShellのMove-AzResourceコマンドレットで行います。移動によってリソースの動作が影響を受けることはありません。リソースグループの名前は、後から変更できません。また、リソースグループを削除すると、そのリソースグループ内のすべてのリソースが削除されるため、注意が必要です。"},{"id":7,"chapter":"第1章","qNum":8,"question":"ローカルのWindowsデバイスから初めてPowerShellを使用してAzureの管理を行う場合、最初に必要となるコマンドまたはコマンドレットとして適切なものはどれですか。","choices":[{"key":"A","text":"Connect-AzAccount"},{"key":"B","text":"Get-Command"},{"key":"C","text":"az login"},{"key":"D","text":"Install-Module -Name Az"}],"answer":["D"],"isMulti":false,"explanation":"WindowsデバイスからPowerShellを使用してAzureの管理を行う場合は、最初に「Install-Module -Name Az」を実行してそのデバイスにAzure PowerShellのモジュールをインストールする必要があります。モジュールのインストール後は、「Connect-AzAccount」を実行してAzureに接続すると、各種の操作を実行できます。Get-Commandは、使用可能なコマンドレットを確認するためのコマンドレットです。az loginは、Azure CLIで接続を行うコマンドです。"},{"id":8,"chapter":"第1章","qNum":9,"question":"Azure Cloud Shellに関する説明として、誤っているものは次のうちどれですか。","choices":[{"key":"A","text":"BashとPowerShellのシェルを選択して使用できる"},{"key":"B","text":"Azure CLIやAzure PowerShellを使用することができる"},{"key":"C","text":"アクセスするたびにストレージアカウントを作成する必要がある"},{"key":"D","text":"Webブラウザー画面でコマンドを用いてAzure管理ができる"}],"answer":["C"],"isMulti":false,"explanation":"Azure Cloud Shellにアクセスするたびにストレージアカウントを作成する必要はありません。初回のアクセス時のみ、ストレージアカウントをマウントするかどうかの選択画面が表示されます。ストレージアカウントをマウントした場合、それ以降のアクセス時にはそのストレージアカウントのファイル共有が自動的にマウントされます。"},{"id":9,"chapter":"第1章","qNum":10,"question":"ARMテンプレートの特徴に関する説明として、適切なものはどれですか。","choices":[{"key":"A","text":"クラシックデプロイモデルで使用できる"},{"key":"B","text":"エラーの削減や一貫性のあるデプロイを実現できる"},{"key":"C","text":"テンプレートはHTML形式で記述する"},{"key":"D","text":"最新のREST APIバージョンのみサポートされている"}],"answer":["B"],"isMulti":false,"explanation":"ARMテンプレートを使用することで、エラーを減らし、一貫性のあるデプロイを実現することができます。また、依存関係のある複数のリソースを作成する場合、依存関係を崩すことなく、複数のリソースを一度の操作でデプロイできます。ARMテンプレートは、Resource Managerデプロイモデルで使用できる機能であり、JSON形式で記述します。最新のREST APIバージョンだけでなく、過去のREST APIバージョンも基本的にはサポートされています。ただし、過去のバージョンは将来的に非推奨になったり、廃止される可能性は考えられます。"},{"id":10,"chapter":"第1章","qNum":11,"question":"テンプレートからデプロイを行う際に、特定の情報の値をユーザーに入力してもらうために構成するセクションは、次のうちどれですか。","choices":[{"key":"A","text":"outputs"},{"key":"B","text":"variables"},{"key":"C","text":"contentVersion"},{"key":"D","text":"parameters"}],"answer":["D"],"isMulti":false,"explanation":"parametersセクションには、リソースをデプロイするときにユーザーに入力させるパラメーターを指定します。これにより、「リソースの名前」や「サイズ」などをユーザーが入力できるようになるため、テンプレートの汎用性を向上できます。outputsセクションには、デプロイによって返される値を指定します。variablesセクションには、テンプレート内で使用する値を変数として定義します。contentVersionセクションには、テンプレートのバージョンを記述します。"},{"id":11,"chapter":"第1章","qNum":12,"question":"次のAzureポータルのメニューのうち、テンプレートからのデプロイの履歴や出力結果の確認に使用できるものとして、最も適切なものはどれですか。","choices":[{"key":"A","text":"[リソースグループ]の[デプロイ]"},{"key":"B","text":"[サブスクリプション]の[使用量+クォータ]"},{"key":"C","text":"[お気に入りバー]の[すべてのリソース]"},{"key":"D","text":"[リソースの作成]の[テンプレートのデプロイ]"}],"answer":["A"],"isMulti":false,"explanation":"[リソースグループ]の[デプロイ]を使用するのが最も適切な方法です。テンプレートからデプロイを行うと直後に結果情報が表示されますが、[デプロイ]のメニューでは後から履歴や出力結果を確認できます。[サブスクリプション]の[使用量+クォータ]は、クォータの確認や引き上げ要求などを行うためのメニューです。[お気に入りバー]の[すべてのリソース]では全リソースの一覧を表示できますが、そこからデプロイの履歴などを追跡するのは困難です。[リソースの作成]の[テンプレートのデプロイ]は、デプロイ時に使用しますが、後から履歴の確認などはできません。"},{"id":12,"chapter":"第2章","qNum":1,"question":"Microsoft Entra IDに関する説明として、誤っているものは次のうちどれですか。","choices":[{"key":"A","text":"Kerberosという仕組みを用いて認証と認可を行う"},{"key":"B","text":"Microsoft Entra IDの管理自体はクラウドで行う"},{"key":"C","text":"クラウドでの認証と認可を行うためのサービスである"},{"key":"D","text":"Microsoft Entra IDにはSaaSアプリを登録し、その認証基盤として利用できる"}],"answer":["A"],"isMulti":false,"explanation":"Kerberosは、AD DSで使用されるプロトコルです。Microsoft Entra IDは、SAML、WS-Federation、OpenID Connect、OAuthなどのプロトコルで認証と認可を行います。"},{"id":13,"chapter":"第2章","qNum":2,"question":"Microsoft Entra IDとAD DSとの比較に関する説明として、適切なものはどれですか(2つ選択)。","choices":[{"key":"A","text":"どちらも親ドメインと子ドメインという親子関係を用いて構成できる"},{"key":"B","text":"どちらもディレクトリサービスだが、使用目的の範囲が異なる"},{"key":"C","text":"Microsoft Entra IDではOUを用いてオブジェクトを階層的に管理できる"},{"key":"D","text":"Microsoft Entra IDにはグループポリシーの管理機能はない"}],"answer":["B","D"],"isMulti":true,"explanation":"AD DSはオンプレミス内での認証と認可のために使用されますが、Microsoft Entra IDはクラウドでの認証と認可のために使用されます。また、AD DSはグループポリシーという管理機能を用いてコンピューターの構成管理を行うことができますが、Microsoft Entra IDにはグループポリシーの機能はありません。Microsoft Entra IDでは構成管理にMicrosoft Intuneなどのクラウドサービスを使用します。ドメインの親子関係や、OUを用いたオブジェクトの階層的な管理はAD DSの特徴です。"},{"id":14,"chapter":"第2章","qNum":3,"question":"Microsoft Entra IDのセルフサービスパスワードリセットで、秘密の質問によるリセットが利用できるようにしたい場合、管理者が構成する必要のあるパラメーターはどれですか(2つ選択)。","choices":[{"key":"A","text":"リセットするために答える必要がある質問の数"},{"key":"B","text":"ユーザーがリセットできる回数"},{"key":"C","text":"質問ごとのレベル"},{"key":"D","text":"登録する質問の数"}],"answer":["A","D"],"isMulti":true,"explanation":"セルフサービスパスワードリセットで秘密の質問によるリセットが利用できるように構成する場合は、登録する質問の数と、リセットするためにいくつの質問に答える必要があるかを管理者が設定します。ユーザーがリセットできる回数や、質問ごとのレベルに関する設定はありません。"},{"id":15,"chapter":"第2章","qNum":4,"question":"Azureポータルで新しくMicrosoft Entra IDのテナントを作成する場合に、初期ドメイン名の形式として適切なものはどれですか。","choices":[{"key":"A","text":"xxx.aad.azure.com"},{"key":"B","text":"xxx.onmicrosoft.com"},{"key":"C","text":"xxx.outlook.jp"},{"key":"D","text":"xxx.azurewebsites.net"}],"answer":["B"],"isMulti":false,"explanation":"新しく作成するテナントの初期ドメイン名は「xxx.onmicrosoft.com」という形式になり、ほかの組織とバッティングしない一意の名前を指定する必要があります。初期ドメイン名の形式は決まっていますが、必要に応じてカスタムドメイン名を追加し、別のドメイン名を使用できるように構成することができます。"},{"id":16,"chapter":"第2章","qNum":5,"question":"Microsoft Entra ID Freeプランを利用しているテナントで、カスタムドメイン名を設定したい場合に必要となる操作および作業として適切なものはどれですか。","choices":[{"key":"A","text":"プランのアップグレード"},{"key":"B","text":"Azureサブスクリプションのサインアップ"},{"key":"C","text":"DNSレコードの登録"},{"key":"D","text":"テナントの切り替え"}],"answer":["C"],"isMulti":false,"explanation":"カスタムドメイン名は、「xxx.com」や「xxx.co.jp」のように短いドメイン名を追加するという設定です。カスタムドメイン名はMicrosoft Entra ID Freeのプランでも使用できますが、追加したドメイン名を使用するには、DNSレコードを登録してドメイン名の所有権を確認できるようにする必要があります。Azureサブスクリプションのサインアップは、そのテナントでAzureの仮想マシンなどのサービスを使用するための操作です。また、テナントの切り替えは、Azureポータルで操作するテナントを切り替えるための操作です。"},{"id":17,"chapter":"第2章","qNum":6,"question":"新しく作成したMicrosoft Entra IDユーザーにMicrosoft Entra ID P1のライセンスを割り当てようとするとエラーが表示され、ライセンスの割り当てに失敗してしまいました。次のうち、見直すべき情報として適切なものはどれですか。","choices":[{"key":"A","text":"ユーザーの[ユーザープリンシパル名]属性"},{"key":"B","text":"ユーザーの[アカウントの有効化]属性"},{"key":"C","text":"ユーザーの[利用場所]属性"},{"key":"D","text":"テナントの[カスタムドメイン名]"}],"answer":["C"],"isMulti":false,"explanation":"Microsoft Entra ID P1などの一部のクラウドサービスのライセンス割り当てを行うには、ユーザーの[利用場所]属性を事前に設定しておく必要があります。この属性が未設定になっていると、ライセンスの割り当て時にエラーが表示されます。"},{"id":18,"chapter":"第2章","qNum":7,"question":"Microsoft Entra IDでのアクセス許可やライセンスの割り当てをまとめて行うために、Microsoft Entra IDのユーザーやデバイスを含めることができるグループの種類として適切なものはどれですか。","choices":[{"key":"A","text":"セキュリティグループ"},{"key":"B","text":"配布リスト"},{"key":"C","text":"Microsoft 365グループ"},{"key":"D","text":"管理グループ"}],"answer":["A"],"isMulti":false,"explanation":"ユーザーやデバイスを含めることができ、Microsoft Entra IDでのアクセス許可やライセンスの割り当てをまとめて行うために使用できるグループの種類はセキュリティグループです。Microsoft 365グループにはデバイスを含めることはできません。配布リストは、Exchange Onlineでのメーリングリストとして使用するグループです。管理グループはMicrosoft Entra IDのグループの種類ではなく、複数のAzureサブスクリプションにまとめて同じAzure Policyを適用するためなどに使用されます。"},{"id":19,"chapter":"第2章","qNum":8,"question":"Microsoft Entra ID Freeプランのテナントがあります。ユーザーの部署属性の値に基づいて動的にグループのメンバーを管理したい場合、最初に行うべき操作として適切なものはどれですか。","choices":[{"key":"A","text":"動的メンバーシップルールの作成"},{"key":"B","text":"カスタムロールの作成"},{"key":"C","text":"カスタムドメイン名の追加"},{"key":"D","text":"プランのアップグレード"}],"answer":["D"],"isMulti":false,"explanation":"Microsoft Entra IDでは、動的メンバーシップルールと呼ばれるクエリを定義し、ユーザーやデバイスの属性に基づいてグループのメンバーを動的に管理することができます。ただし、これはMicrosoft Entra ID P1以上のプランで使用できる機能であるため、Microsoft Entra ID Freeプランでは使用できません。したがって、今回のシナリオでは最初にプランをアップグレードする必要があります。カスタムロールは、Microsoft Entra IDテナントの管理権限を与えるためのオリジナルのロールを作成する操作です。カスタムドメイン名の追加は、短いドメイン名を追加する設定です。"},{"id":20,"chapter":"第2章","qNum":9,"question":"テナント内のグループには、次の構文で動的メンバーシップルールが構成されています。\n(user.country -eq \"JP\" -and -not (user.department -eq \"Sales\" -or user.department -eq \"Research\"))\nこのグループに含まれるメンバーとして適切なものはどれですか。","choices":[{"key":"A","text":"部署属性に\"Sales\"、国属性に\"JP\"の値を持つユーザー"},{"key":"B","text":"部署属性に\"Research\"、国属性に\"US\"の値を持つユーザー"},{"key":"C","text":"部署属性に\"Dev\"、国属性に\"JP\"の値を持つユーザー"},{"key":"D","text":"部署属性に\"Research\"、国属性に\"JP\"の値を持つユーザー"}],"answer":["C"],"isMulti":false,"explanation":"動的メンバーシップルールの論理演算子は優先順位の高いものから、-not、-and、-orの順で評価されます。また、かっこを追加した場合はかっこ内が優先的に評価されます。そのため、この構文は、「ユーザーの部署属性が\"Sales\"または\"Research\"と等しくなく、かつ、ユーザーの国属性が\"JP\"と等しい」という意味を持ちます。"},{"id":21,"chapter":"第2章","qNum":10,"question":"次のMicrosoft Entra IDのロールのうち、すべてのグループおよびメンバーの管理やほかのユーザーへのロールの割り当てを行うことができるロールはどれですか。","choices":[{"key":"A","text":"ユーザー管理者"},{"key":"B","text":"グローバル管理者"},{"key":"C","text":"ライセンス管理者"},{"key":"D","text":"グローバル閲覧者"}],"answer":["B"],"isMulti":false,"explanation":"選択肢のうち、すべてのグループおよびメンバーの管理やほかのユーザーへのロールの割り当てを行うことができるのは、グローバル管理者のみです。ユーザー管理者は、グループやメンバーの管理操作を行うことはできますが、ほかのユーザーへロールを割り当てることはできません。また、グローバル閲覧者はすべての情報を読み取ることはできますが、変更を行うことはできません。ライセンス管理者はユーザーやグループに対するライセンス関連の操作(割り当てなど)が可能なロールであり、グループのメンバー管理やほかのユーザーへのロール割り当ては行えません。"},{"id":22,"chapter":"第2章","qNum":11,"question":"ディレクトリ同期を行う前に、Microsoft Entra IDでは使用できない文字がAD DSで使われていないかなどを確認するために役立つツールとして適切なものはどれですか。","choices":[{"key":"A","text":"Microsoft Entra Connect"},{"key":"B","text":"IdFix"},{"key":"C","text":"Microsoft Entra Connect Health"},{"key":"D","text":"Azure CLI"}],"answer":["B"],"isMulti":false,"explanation":"AD DSとMicrosoft Entra IDの各ディレクトリでは使用可能な文字に違いがあるため、そのままディレクトリ同期を行うとエラーになってしまう可能性があります。その確認を行うためにIdFixというツールが提供されており、このツールを使用して無効な文字の確認などの問題の検出やその修正ができます。Microsoft Entra Connectは、ディレクトリ同期を実行するためのツールです。Microsoft Entra Connect Healthは、同期サーバーなどのIDインフラストラクチャを監視および把握するための機能です。Azure CLIは、コマンドラインからAzureを操作するための管理ツールです。"},{"id":23,"chapter":"第3章","qNum":1,"question":"Microsoft Azureの次の機能のうち、既存のAzure環境内のリソースの構成や利用統計情報などを分析し、マイクロソフトでの推奨事項と比較した結果を返すものはどれですか。","choices":[{"key":"A","text":"タグ"},{"key":"B","text":"RBAC"},{"key":"C","text":"ロック"},{"key":"D","text":"Azure Advisor"}],"answer":["D"],"isMulti":false,"explanation":"Azure Advisorは、Azure環境および存在するリソースをスキャンし、マイクロソフトが提供する推奨事項に基づいて問題点を見つけ、それを解決するための方法を提案します。タグは、リソースの検索性の向上やコスト集計に役立つ機能です。RBACはリソースへのアクセス制御を行う機能です。ロックは、誤操作によるリソースの変更や削除を防ぐ機能です。"},{"id":24,"chapter":"第3章","qNum":2,"question":"1つのサブスクリプションでMicrosoft Azureを使用する環境があります。この環境でコスト確認を行う際に、管理部門や用途などの単位でコストを集計して確認できるようにしたいと考えています。このシナリオを実現するために行うべき操作として最も適切なものはどれですか。","choices":[{"key":"A","text":"管理部門や用途ごとのカスタムロールを作成する"},{"key":"B","text":"リソースやリソースグループにタグを設定する"},{"key":"C","text":"管理部門や用途ごとの管理グループを作成する"},{"key":"D","text":"複数の異なるサブスクリプションを使用する"}],"answer":["B"],"isMulti":false,"explanation":"リソースやリソースグループに、管理部門や用途などのタグを設定することで、そのタグごとのコスト集計ができます。異なるサブスクリプションを使用する方法でも、サブスクリプション単位でコストを分割して確認できますが、管理するサブスクリプションが増えるため、このシナリオの最適解とは言えません。同様に、管理グループ単位でもコストを確認できますが、このシナリオでは1つだけのサブスクリプションを使用しているため最適解とは言えません。カスタムロールはRBACでのアクセス制御を行うための機能であり、コスト集計を目的としたものではありません。"},{"id":25,"chapter":"第3章","qNum":3,"question":"使用しているMicrosoft Azureの環境にRG1というリソースグループがあります。RG1には重要度の高い複数のリソースが含まれています。これらのリソースが誤って削除されないように保護する必要がありますが、リソースの変更を防ぐ必要はありません。行うべき操作として最も適切なものはどれですか。","choices":[{"key":"A","text":"RG1に削除ロックを設定する"},{"key":"B","text":"RG1に重要度というタグを設定する"},{"key":"C","text":"RBACを使用し、RG1内のリソースを削除できるユーザーを制限する"},{"key":"D","text":"RG1内の個々のリソースに読み取り専用ロックを設定する"}],"answer":["A"],"isMulti":false,"explanation":"RG1に削除ロックを設定することで、リソースグループおよび含まれるリソースの削除操作を禁止できます。個々のリソース読み取り専用ロックを設定することでも結果的にリソース削除を防止できますが、このシナリオではリソースの変更を防ぐ必要はないため、削除ロックを使用するのが最適解と言えます。タグは単なるメモ書きであり、特定の操作を禁止する設定ではありません。また、RBACはリソースを削除できるユーザーを制限できますが、誤操作を防ぐものではありません。"},{"id":26,"chapter":"第3章","qNum":4,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。クォータに対する使用量を確認したところ、ある種類のリソースの使用量が現在のクォータの値に迫っていることに気づきました。あなたは、業務に影響が出ないようにクォータの値を引き上げる必要があります。行うべき操作として最も適切なものはどれですか。","choices":[{"key":"A","text":"既存のリソースを別のリソースグループに移動する"},{"key":"B","text":"クォータの増加の要求を送信する"},{"key":"C","text":"新しいサブスクリプションを購入する"},{"key":"D","text":"不要なリソースを停止する"}],"answer":["B"],"isMulti":false,"explanation":"クォータの値を引き上げるには、クォータの増加の要求(サポートリクエスト)の送信を行う必要があります。この操作によってマイクロソフトに連絡が行き、結果的にクォータの値が増加します。クォータの値はサブスクリプションごとに設定されているため、新しいサブスクリプションを購入する方法でも今回のシナリオを回避できますが、管理するサブスクリプションが増えるため、このシナリオでは最適解とは言えません。同一サブスクリプションの別のリソースグループに移動しても、クォータの値は変わりません。また、不要なリソースを削除すれば使用量は減りますが、停止では変わりません。"},{"id":27,"chapter":"第3章","qNum":5,"question":"あなたは組織のMicrosoft Azureの管理者で、想定以上の過大なコストの発生を防ぐために、コストの監視を行っています。発生するコストが一定の金額を超えた場合に、アラートメールを受信するために設定すべきものはどれですか。","choices":[{"key":"A","text":"Azure Policy"},{"key":"B","text":"予約"},{"key":"C","text":"Azureハイブリッド特典"},{"key":"D","text":"予算"}],"answer":["D"],"isMulti":false,"explanation":"予算を設定することで、指定した予算の割合に達したときにアラートメールを送信することができます。アラートメールの送信のほか、Automation Runbookやロジックアプリを用いて特定のアクションを実行することもできます。Azure Policyは、ビジネスルールに基づいてAzureの特定の操作を制限したい場合などに役立つ機能です。予約とAzureハイブリッド特典は、コストを削減するためのオプションです。"},{"id":28,"chapter":"第3章","qNum":6,"question":"Azure Policyに関する説明として、誤っているものは次のうちどれですか。","choices":[{"key":"A","text":"特定のリージョンだけにリソースが作成されるように制限できる"},{"key":"B","text":"誤った操作によってリソースの削除や変更が行われないように保護できる"},{"key":"C","text":"特定のタグを付けることを必須にし、リソース管理の一貫性を高めるために役立つ"},{"key":"D","text":"必要以上の仮想マシンのサイズが選択できないように制限できる"}],"answer":["B"],"isMulti":false,"explanation":"誤った操作によって、リソースの削除や変更が行われないように保護する機能はロックです。Azure Policyは、組織のビジネスルールに基づいたAzure環境を実現するための機能であり、ポリシーに準拠するパラメーターのリソース作成のみを許可したり、リソースの作成時に特定のタグを付けることを必須にして管理の一貫性を高めることなどができます。"},{"id":29,"chapter":"第3章","qNum":7,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたは管理者としてAzure Policyを実装し、組織で定められたいくつかのビジネスルールをリソースに対して強制する必要があります。Azure Policyを実装するための3つの操作を選択し、適切な順序で並べなさい。","choices":[{"key":"A","text":"割り当ての設定"},{"key":"B","text":"ポリシー定義の作成"},{"key":"C","text":"管理グループの作成"},{"key":"D","text":"イニシアティブ定義の作成"}],"answer":["A","B","D"],"isMulti":true,"explanation":"Azure Policyを実装するには、まず、組織の目的を達成するためのポリシー定義を作成する必要があります。次に、イニシアティブ定義を作成して、複数のポリシー定義をグループ化します。そして、イニシアティブ定義をサブスクリプションやリソースグループなどに割り当てて、その評価を確認します。作成したポリシー定義は管理グループに割り当てることもできますが、今回のシナリオでは1つのサブスクリプションしか持たないため、管理グループの作成は不要です。"},{"id":30,"chapter":"第3章","qNum":8,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたは管理者としてAzure Policyを実装しようとしていますが、組み込みのポリシー定義では組織のビジネスルールを満たすことができないようです。行うべき操作として適切なものはどれですか(2つ選択)。","choices":[{"key":"A","text":"イニシアティブ定義を作成する"},{"key":"B","text":"新規にポリシー定義を作成し、ポリシールールをJSONで記述する"},{"key":"C","text":"GitHubからポリシー定義のサンプルをインポートして使用する"},{"key":"D","text":"組み込みのポリシー定義を直接編集する"}],"answer":["B","C"],"isMulti":true,"explanation":"目的の達成に適した組み込みのポリシー定義がない場合には、新しいポリシー定義を追加することができます。新規に作成してポリシールールをJSONで記述するほか、組み込みのポリシー定義を複製して編集したり、GitHubからポリシー定義のサンプルをインポートして使用することもできます。組み込みのポリシー定義を直接編集することはできませんが、複製したものを編集して使用することは可能です。イニシアティブ定義は、複数のポリシー定義を同時に適用し、それらのすべてのポリシー定義に準拠しているかどうかをまとめて確認するために使用します。"},{"id":31,"chapter":"第3章","qNum":9,"question":"RBACおよびAzureのロールに関する説明として、誤っているものはどれですか。","choices":[{"key":"A","text":"カスタムロールを作成するにはMicrosoft Entra ID P1またはP2が必要"},{"key":"B","text":"ロール定義と割り当てによって構成する"},{"key":"C","text":"サブスクリプションなどのスコープに対してアクセス制御ができる"},{"key":"D","text":"各スコープでどのような操作が実行できるかは、割り当てたロールによって決定される"}],"answer":["A"],"isMulti":false,"explanation":"Azureには様々な組み込みのロールがありますが、独自のカスタムロールを作成することもできます。AzureのカスタムロールAzureのカスタムロールの作成には特別な契約などは不要です。ただし、Microsoft Entra IDのカスタムロールを作成するにはMicrosoft Entra ID P1またはP2の契約が必要となります。"},{"id":32,"chapter":"第3章","qNum":10,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、RG1とRG2というリソースグループがあります。あなたは管理者であり、user1に対し、RG1内のすべてのリソースにフルアクセスできるが、ほかのリソースにはアクセスできないように構成する必要があります。また、user1がほかのユーザーにアクセス権を付与できないように構成する必要もあります。user1に割り当てるロールとそのスコープの組み合わせとして最も適切なものはどれですか。","choices":[{"key":"A","text":"サブスクリプションの所有者ロール"},{"key":"B","text":"サブスクリプションの共同作成者ロール"},{"key":"C","text":"RG1の所有者ロール"},{"key":"D","text":"RG1の共同作成者ロール"}],"answer":["D"],"isMulti":false,"explanation":"このシナリオでは、RG1をスコープとする共同作成者のロールをuser1に割り当てるのが最も適切です。サブスクリプションをスコープとする共同作成者のロールを割り当てた場合は、RG2に対してもフルアクセスを持つことになるため、最適解とは言えません。所有者ロールでは、ほかのユーザーへアクセス権を付与できてしまうため、このシナリオでは不適切です。"},{"id":33,"chapter":"第3章","qNum":11,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。また、RG1というリソースグループがあり、このリソースグループ内には3つの仮想マシン(VM1、VM2、VM3)があります。あなたは管理者であり、user1がVM2のリソースを変更できるように構成する必要があります。ただし、VM1とVM3の変更ができてはいけません。行うべき操作として最も適切なものはどれですか。","choices":[{"key":"A","text":"VM2を新しいリソースグループに移動し、そのリソースグループの共同作成者ロールをuser1に割り当てる"},{"key":"B","text":"user1にRG1の共同作成者ロールを割り当て、さらにVM2の所有者ロールを割り当てる"},{"key":"C","text":"user1にRG1の共同作成者ロールを割り当てる"},{"key":"D","text":"user1にVM2の共同作成者ロールを割り当てる"}],"answer":["D"],"isMulti":false,"explanation":"user1にVM2の共同作成者ロールを割り当てるのが、このシナリオでは最も適切です。VM2を新しいリソースグループに移動し、そのリソースグループの共同作成者ロールを割り当てる方法でも要件は実現できますが、新しいリソースグループの作成や管理が必要になるため、このシナリオの最適解とは言えません。RG1に共同作成者ロールを割り当てた場合はVM1とVM3も変更できてしまうため、このシナリオでは不適切です。"},{"id":34,"chapter":"第3章","qNum":12,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。また、RG1とRG2というリソースグループがあり、各リソースグループ内には複数のリソースが含まれています。user1にはサブスクリプションの閲覧者ロールが割り当てられ、さらに、user1にはRG1の共同作成者ロールも割り当てられています。このとき、user1が実行可能な操作はどれですか(3つ選択)。","choices":[{"key":"A","text":"RG1内にストレージアカウントを作成する"},{"key":"B","text":"RG2内に仮想マシンを作成する"},{"key":"C","text":"RG1内の仮想ネットワークを表示する"},{"key":"D","text":"RG2内のSQL Databaseを表示する"},{"key":"E","text":"新しいリソースグループを作成する"}],"answer":["A","C","D"],"isMulti":true,"explanation":"複数のロールが割り当てられる場合は、割り当てられたロールの和集合が実際のアクセス許可となります。今回のシナリオでは、まず、user1にはサブスクリプションの閲覧者ロールが割り当てられているため、サブスクリプション内のすべてのリソースを表示できます。さらに、RG1の共同作成者ロールも割り当てられているため、RG1内ではリソースに対するすべての操作を行うことができます。サブスクリプションには閲覧者ロールしか割り当てられていないため、新しいリソースグループを作成することはできません。RG2については、サブスクリプションからのアクセス権の継承によって、リソースの表示はできますが作成はできません。"},{"id":35,"chapter":"第3章","qNum":13,"question":"あなたが使用するMicrosoft Azure環境には複数のサブスクリプションがあります。あなたは管理者としてAzure PolicyやRBACを実装しようとしていますが、すべてのサブスクリプションに対して同じポリシーを割り当てたいと考えています。また、RBACについても、上位のスコープからアクセス権の設定を継承し、効率良く設定したいと考えています。そのために行う操作として最も適切なものはどれですか。","choices":[{"key":"A","text":"自身が使用するユーザーにグローバル管理者ロールを割り当てる"},{"key":"B","text":"管理グループを作成し、管理グループにすべてのサブスクリプションを追加する"},{"key":"C","text":"既存のリソースを削除し、1つのサブスクリプションで管理されるようにリソースを再作成する"},{"key":"D","text":"サブスクリプション間でリソースを移動し、1つのサブスクリプションに統合する"}],"answer":["B"],"isMulti":false,"explanation":"管理グループを作成して複数のサブスクリプションをグルーピングすることにより、管理グループ単位でのAzure PolicyやRBACの設定ができます。管理グループに対して設定した内容は配下のサブスクリプションやリソースに継承されるため、同じポリシーの割り当てやアクセス権の設定を効率化できます。1つのサブスクリプションで管理するように変更するのも1つの方法ではありますが、既存のリソースの削除や再作成を伴う操作は最適解とは言えません。また、多くのリソースはサブスクリプション間で移動できますが、移動できない種類のリソースもあります。グローバル管理者はMicrosoft Entra IDのリソースのアクセス管理のためのロールであり、今回のシナリオでは不適切です。"},{"id":36,"chapter":"第4章","qNum":1,"question":"仮想マシンサービスの説明として、誤っているものは次のうちどれですか。","choices":[{"key":"A","text":"CPUやメモリ、ディスクなどのコンピューティング環境を提供する"},{"key":"B","text":"豊富なイメージの選択肢から迅速に仮想マシンを展開できる"},{"key":"C","text":"WindowsまたはmacOSの仮想マシンを作成し、任意のワークロードを実行できる"},{"key":"D","text":"仮想マシンの性能は仮想マシンの作成後にも変更できる"}],"answer":["C"],"isMulti":false,"explanation":"仮想マシンサービスでは、WindowsまたはLinuxの仮想マシンを作成して、その仮想マシン上で任意のワークロードを実行できます。macOSの仮想マシンを作成することはできません。"},{"id":37,"chapter":"第4章","qNum":2,"question":"使用しているMicrosoft Azureの環境にはVM1という名前の仮想マシンがあります。VM1はAzure MarketplaceのWindows Server 2022のイメージから作成された仮想マシンで、現在の状態は実行中です。この仮想マシンのリソースとしての名前をVM2に変更したいと考えています。行うべき操作として適切なものはどれですか。","choices":[{"key":"A","text":"VM2という名前の新しい仮想マシンを作成する"},{"key":"B","text":"仮想マシンを停止した後でAzureポータルから名前を変更する"},{"key":"C","text":"VM1にリモートデスクトップ接続し、コンピューター名を変更して再起動する"},{"key":"D","text":"VM1のサイズ変更と同時に新しい仮想マシン名を設定する"}],"answer":["A"],"isMulti":false,"explanation":"リソースとしての仮想マシンの名前(仮想マシン名)は後から変更することができません。そのため、新しい名前で仮想マシンを作成し直す必要があります。仮想マシンの名前のほか、イメージや可用性オプションについても後から変更できないため、作成する前にどのような設定値にするか計画しておくことが重要です。仮想マシン作成時に設定した名前は、仮想マシンで実行するOSのホスト名(コンピューター名)としても使用されます。ただし、仮想マシンにリモートデスクトップ接続してコンピューター名を変更しても、Azureのリソースとしての仮想マシンの名前は変更されません。また、サイズの変更はCPUやメモリなどの性能を変更する操作であり、新しい仮想マシン名は設定できません。"},{"id":38,"chapter":"第4章","qNum":3,"question":"仮想マシンのリージョンに関する説明として適切なものはどれですか(2つ選択)。","choices":[{"key":"A","text":"リージョンによって使用できる可用性オプションが異なる"},{"key":"B","text":"どのリージョンでも選択可能なサイズは同じである"},{"key":"C","text":"リージョンによって仮想マシンに対して発生するコストが異なる"},{"key":"D","text":"リソースグループのリージョンと合わせる必要がある"}],"answer":["A","C"],"isMulti":true,"explanation":"リージョンによって、仮想マシンで選択可能なサイズ、可用性オプション、コストなどが異なります。そのため、組織で定めているコンプライアンス要件だけでなく、仮想マシンのサイズや可用性オプションの必要性、コスト面も考慮して作成先のリージョンを決定する必要があります。リソースグループのリージョンと仮想マシンのリージョンは必ずしも合わせる必要はありません。ただし、管理上のわかりやすさから、仮想マシン作成時の既定値ではリソースグループと同じリージョンが選択されます。"},{"id":39,"chapter":"第4章","qNum":4,"question":"仮想マシンのディスクに関する説明として、誤っているものはどれですか。","choices":[{"key":"A","text":"構成するディスクには、OSディスク、一時ディスク、データディスクがある"},{"key":"B","text":"OSディスクは、OSが含まれるディスクである"},{"key":"C","text":"一時ディスクは、Windows仮想マシンでは既定でDドライブとしてラベル付けされる"},{"key":"D","text":"データディスクは非永続化領域であり、アプリケーションやデータの保存先として使用すべきではない"}],"answer":["D"],"isMulti":false,"explanation":"データディスクは、アプリケーションやデータを格納する領域として使用するためのディスクです。非永続化領域として扱われるのは一時ディスクです。そのため、一時ディスクはページファイルなどのキャッシュの格納先として適していますが、アプリケーションやデータの保存先として使用すべきではありません。"},{"id":40,"chapter":"第4章","qNum":5,"question":"仮想マシンで使用するOSイメージやサポートされるOSに関する説明として適切なものはどれですか(2つ選択)。","choices":[{"key":"A","text":"Azure MarketplaceのWindows 11のイメージにはライセンスが含まれている"},{"key":"B","text":"AzureMarketplaceではOSとしてのサポートが終了したWindows Serverのイメージも提供されている"},{"key":"C","text":"仮想マシンではインプレースアップグレードがサポートされている"},{"key":"D","text":"Azure Marketplaceにはサードパーティ製のものを含む様々なイメージがある"}],"answer":["C","D"],"isMulti":true,"explanation":"Azure Marketplaceには、マイクロソフトやサードパーティによって発行された様々なイメージが公開されています。AzureでサポートされるOSは大きく分けるとWindowsとLinuxがありますが、どちらのOSを実行する仮想マシンでもインプレースアップグレードがサポートされています。Azure MarketplaceにはWindows 11のイメージもありますが、ライセンスは含まれていないため、ライセンスは別途用意する必要があります。また、OSとしてのサポートが終了したWindows ServerのイメージはAzure Marketplaceで提供されていないため、利用者自身でイメージを準備する必要があります。"},{"id":41,"chapter":"第4章","qNum":6,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。この環境内に同じ役割を持ついくつかの仮想マシンを1つのリージョン内に作成する予定です。ただし、作成する仮想マシンはデータセンター障害に耐えられるように構成する必要があります。仮想マシンの作成時に行うべき構成として適切なものはどれですか。","choices":[{"key":"A","text":"OSのゲスト診断を有効にする"},{"key":"B","text":"異なる可用性ゾーンに配置する"},{"key":"C","text":"同一シリーズのサイズを選択する"},{"key":"D","text":"同一の可用性セットを使用する"}],"answer":["B"],"isMulti":false,"explanation":"可用性ゾーンを使用して複数の仮想マシンを作成することにより、同一リージョンでのデータセンター障害に耐えられるように構成できます。例えば、VM1をゾーン1、VM2をゾーン2に配置すれば、VM1が配置されたデータセンターで障害が発生したとしてもVM2には影響しません。OSのゲスト診断の有効化は、仮想マシンの監視を行うための診断エージェントを追加する操作であり、可用性を高めるオプションではありません。サイズは仮想マシンのCPUやメモリなどの性能のパラメーターであり、同一シリーズのサイズを選択しても可用性は向上しません。可用性セットはデータセンター内でのラック障害などには対応できますが、データセンター障害には対応できません。"},{"id":42,"chapter":"第4章","qNum":7,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。この環境内に同じ役割を持ついくつかの仮想マシンを1つのリージョン内に作成する予定です。これらの仮想マシンは、1つのデータセンター内で仮想マシンの配置先となるラックの分散数を最大化するように作成する必要があります。要件を満たすための操作として適切なものはどれですか。","choices":[{"key":"A","text":"障害ドメインの値を5にした可用性ゾーンを設定する"},{"key":"B","text":"障害ドメインの値を3にした可用性セットを作成する"},{"key":"C","text":"更新ドメインの値を10にした可用性ゾーンを設定する"},{"key":"D","text":"更新ドメインの値を20にした可用性セットを作成する"}],"answer":["B"],"isMulti":false,"explanation":"可用性セットでは障害ドメインというパラメーターにより、仮想マシンをデータセンター内のいくつのラックに分散して配置するかを決定します。最大値は3です。ただし、選択したサブスクリプションとリージョンによっては障害ドメインの最大値が3より小さい場合もあります。更新ドメインは、仮想マシンをいくつのサーバーグループに分散して配置するかを決定する可用性セットのパラメーターです。サーバーグループは、計画的なメンテナンス時にまとめて再起動されるサーバーの単位です。可用性ゾーンはリージョン内で仮想マシンの配置先を複数のデータセンターに分けるオプションであり、障害ドメインや更新ドメインというパラメーターは持ちません。"},{"id":43,"chapter":"第4章","qNum":8,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。この環境内に、次に示すいくつかの仮想マシンを1つのリージョン内に作成する予定です。\n・2つのWebサーバー\n・2つのアプリケーションサーバー\n・2つのデータベースサーバー\n同じ役割を持つ仮想マシンは同じラックやブレード上で実行されないように配置し、各層の稼働時間を最大化する必要があります。可用性セットと仮想マシンの構成として適切なものはどれですか。","choices":[{"key":"A","text":"2つの可用性セットを作成し、異なる役割を持つ3つのサーバーが同一の可用性セットを使用するように構成する"},{"key":"B","text":"Webサーバーとアプリケーションサーバーの仮想マシンは同一の可用性セットで構成し、データベースサーバーの仮想マシンは可用性セットを構成しない"},{"key":"C","text":"1つの可用性セットを作成し、すべての仮想マシンで同一の可用性セットを使用するように構成する"},{"key":"D","text":"役割ごとに3つの可用性セットを作成し、同じ役割を持つ仮想マシンが同一の可用性セットを使用するように構成する"}],"answer":["D"],"isMulti":false,"explanation":"このシナリオのように3階層のシステムのために可用性セットを構成する場合は、「Webサーバーの可用性セット」「アプリケーションサーバーの可用性セット」「データベースサーバーの可用性セット」のように役割ごとの可用性セットを作成し、各可用性セットに同じ役割を持つ複数の仮想マシンを含めるように構成します。これによって、各層の稼働時間を最大化できます。"},{"id":44,"chapter":"第4章","qNum":9,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。この環境内にいくつかのWindows仮想マシンを作成し、それらの仮想マシンにはWebサーバーの役割をインストールする予定です。あなたは以下の記述を含むPowerShellスクリプトファイル(.ps1)を作成しました。\nInstall-WindowsFeature -Name Web-Server\n仮想マシンの作成時に拡張機能を使用し、このスクリプトファイルを処理するように構成したいと考えています。使用すべき拡張機能はどれですか。","choices":[{"key":"A","text":"Custom Script Extension"},{"key":"B","text":"Custom Deploy Configuration"},{"key":"C","text":"PowerShell Script Automation"},{"key":"D","text":"PowerShell Desired State Configuration"}],"answer":["A"],"isMulti":false,"explanation":"仮想マシンの初期設定に役立つ拡張機能として、Custom ExtensionとPowerShell Desired State Configurationがあります。今回のシナリオではPowerShellのコマンドレットで記述されたスクリプトファイル(.ps1)を用いるため、Custom Script Extensionの拡張機能を使用するのが適切です。PowerShell Desired State Configurationの場合には、Configurationと呼ばれるスクリプトファイルを使用する必要があります。Custom Deploy ConfigurationとPowerShell Script Automationという拡張機能はありません。"},{"id":45,"chapter":"第4章","qNum":10,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。この環境内にVM1という名前の仮想マシンがあり、VM1の現在の状態は実行中です。VM1にはD2s_v3のサイズが選択されていますが、D4s_v3のサイズを使用するように変更したいと考えています。VM1のサイズの変更操作によって引き起こされる動作として適切なものはどれですか。","choices":[{"key":"A","text":"VM1のキャプチャが行われる"},{"key":"B","text":"VM1の削除と再作成が行われる"},{"key":"C","text":"VM1が再起動される"},{"key":"D","text":"VM1が停止される"}],"answer":["C"],"isMulti":false,"explanation":"実行中の仮想マシンのサイズを変更するとその仮想マシンが自動的に再起動されるため、未保存の作業中のデータが失われてしまうことが考えられます。これを回避するには、サイズの変更前に作業中のデータを保存して仮想マシンを停止し、サイズの変更後に仮想マシンを開始します。サイズ変更操作によって、仮想マシンの削除や再作成、キャプチャが行われることはありません。なお、停止状態の仮想マシンのサイズを変更した場合、仮想マシンは停止したままとなります。"},{"id":46,"chapter":"第4章","qNum":11,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、この環境内にVM1という名前のLinux仮想マシンがあります。あなたはVM1の設定を行うためにリモート接続する必要があります。ただし、あなたの組織には、SSHポートを外部に公開することを禁止するセキュリティポリシーがあります。リモート接続を実現するために行うべき操作として適切なものはどれですか。","choices":[{"key":"A","text":"診断エージェントをインストールする"},{"key":"B","text":"Bastion接続を構成する"},{"key":"C","text":"VM1の[構成]の設定を変更する"},{"key":"D","text":"Custom Script for Linux拡張機能を追加する"}],"answer":["B"],"isMulti":false,"explanation":"Bastion接続は、仮想マシンのRDPまたはSSHのポートを外部に公開することなく、TLS経由でAzureポータルから安全かつシームレスに仮想マシンへリモートデスクトップ接続またはSSH接続を行う方法を提供します。Bastion接続ではポート番号443を使用して、ブラウザーから仮想マシンに接続し、操作することができます。診断エージェントは、ゲストOSが生成するログやメトリックなどの診断データをAzureに収集するためのエージェントです。仮想マシンの[構成]には、リモート接続に関する設定はありません。Custom Script for Linuxは、初期設定を行うシェルスクリプトの実行などに使用される拡張機能です。"},{"id":47,"chapter":"第4章","qNum":12,"question":"仮想マシンスケールセットに関する説明として、誤っているものはどれですか。","choices":[{"key":"A","text":"同じ構成の仮想マシンインスタンスをまとめて作成できる"},{"key":"B","text":"垂直スケーリングを行うために必要な要素と設定が提供される"},{"key":"C","text":"メトリックやスケジュールに基づいてスケーリングできる"},{"key":"D","text":"スケールセット内の仮想マシンをまとめて管理できる"}],"answer":["B"],"isMulti":false,"explanation":"仮想マシンスケールセットでは、水平スケーリングを行うために必要な要素と設定が提供されます。水平スケーリングとは、システムを構成するマシンの台数を増減するアプローチです。垂直スケーリングは、システムを構成するマシンのスペックを変更するアプローチであり、仮想マシンのサイズ変更が垂直スケーリングに該当します。"},{"id":48,"chapter":"第4章","qNum":13,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、この環境内にVMSS1という名前の仮想マシンスケールセットがあります。あなたは、AzureポータルでVMSS1のディスクの設定を変更し、新しいデータディスクを追加しました。ところが、VMSS1内の既存の仮想マシンインスタンスにはデータディスクが追加されていません。VMSS1内の既存の仮想マシンインスタンスにこの変更を反映させるための操作として、最も適切なものはどれですか。","choices":[{"key":"A","text":"各仮想マシンインスタンスの管理画面でデータディスクを追加する"},{"key":"B","text":"すべての仮想マシンインスタンスを削除する"},{"key":"C","text":"仮想マシンインスタンスをアップグレードする"},{"key":"D","text":"インスタンス数の設定を0に変更し、その後で任意のインスタンス数に変更する"}],"answer":["C"],"isMulti":false,"explanation":"仮想マシンスケールセットモデルに対する変更が既存の仮想マシンインスタンスに反映されない場合は、アップグレードモードが[手動]になっていることが考えられます。この場合、スケールセットモデルの変更を既存の仮想マシンインスタンスに適用するには、管理者が仮想マシンインスタンスを手動でアップグレードする必要があります。各仮想マシンインスタンスの管理画面でデータディスクを追加すること自体は可能ですが、既存の仮想マシンインスタンスが多数ある場合は、その数だけ設定変更の操作が必要となるため、最適解とは言えません。また、すべての仮想マシンインスタンスを削除またはインスタンス数を0にすれば、その後に作成される新しい仮想マシンインスタンスは最新のスケールセットモデルの内容に基づいたものとなります。しかし、その間は仮想マシンインスタンスが存在しない状態となるため、最適解とは言えません。"},{"id":49,"chapter":"第4章","qNum":14,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、この環境内にVMSS1という名前の仮想マシンスケールセットがあります。VMSS1はメトリックに基づいてスケーリングするように構成されており、次の複数のスケールイン規則を含む1つの自動スケールプロファイルが構成されています。\n・CPU使用率が25%未満の場合、1つスケールインする\n・メモリ使用率が30%未満の場合、1つスケールインする\nこの自動スケールプロファイルが使用されるとき、VMSS1でスケールインが行われるのは次のどの場合ですか(すべて選択)。","choices":[{"key":"A","text":"CPU使用率が20%でメモリ使用率が25%の場合"},{"key":"B","text":"CPU使用率が30%でメモリ使用率が25%の場合"},{"key":"C","text":"CPU使用率が20%でメモリ使用率が40%の場合"},{"key":"D","text":"CPU使用率が30%でメモリ使用率が35%の場合"}],"answer":["A"],"isMulti":false,"explanation":"複数の規則が1つの自動スケールプロファイル内で構成されているときは、スケールインについては「すべて」の規則が満たされている場合に限って自動スケールが実行されます。このシナリオでは、「CPU使用率が25%未満で、かつ、メモリ使用率が30%未満」の場合にスケールインが行われます。ほかの選択肢では、一方または両方が満たされていないため、スケールインは行われません。"},{"id":50,"chapter":"第5章","qNum":1,"question":"あなたは、AzureのストレージサービスのうちAzure Blob StorageとAzure Filesを使用する予定です。この両方のサービスが使用可能な1つのストレージアカウントを作成しようとしています。使用すべきストレージアカウントの種類として適切なものはどれですか。","choices":[{"key":"A","text":"PremiumブロックBLOB"},{"key":"B","text":"Premiumファイル共有"},{"key":"C","text":"PremiumページBLOB"},{"key":"D","text":"Standard汎用v2"}],"answer":["D"],"isMulti":false,"explanation":"1つのストレージアカウントでAzure Blob StorageとAzure Filesの両方のサービスを使用したい場合は、ストレージアカウントの種類としてStandard汎用v2を使用する必要があります。その他のPremiumのストレージアカウントは特定のストレージサービスのみを対象としており、PremiumブロックBLOBとPremiumページBLOBはAzure Blob Storageのみ、Premiumファイル共有はAzure Filesのみをサポートしています。"},{"id":51,"chapter":"第5章","qNum":2,"question":"使用しているMicrosoft Azureの環境には、storage1という名前のストレージアカウントがあります。このストレージアカウントの概要画面には、[パフォーマンス:Premium]、[アカウントの種類:BlockBlobStorage]という情報が表示されています。あなたは、ファイル共有を新しく作成する必要があります。行うべき操作として適切なものはどれですか。","choices":[{"key":"A","text":"storage1で新しくファイル共有を作成する"},{"key":"B","text":"storage1のアカウントの種類をStandard汎用v2に変更する"},{"key":"C","text":"storage1のパフォーマンスの種類をStandardに変更する"},{"key":"D","text":"新しいストレージアカウントを作成する"}],"answer":["D"],"isMulti":false,"explanation":"ファイル共有を作成するにはStandard汎用v2またはPremiumファイル共有の種類のストレージアカウントを使用する必要がありますが、このシナリオで作成済みのストレージアカウントの種類ではファイル共有を作成できないため、別のストレージアカウントを新規に作成する必要があります。このシナリオで現在使用されているストレージアカウントの種類はPremiumブロックBLOBであり、ファイル共有はサポートされていません。また、ストレージアカウントの種類やパフォーマンスの種類を後から変更することはできません。"},{"id":52,"chapter":"第5章","qNum":3,"question":"Azure Blob Storageのコンテナー作成時に指定する匿名アクセスレベルに関して、[BLOB]と[コンテナー]の違いの説明として適切なものはどれですか。","choices":[{"key":"A","text":"インターネット経由での匿名アクセスが禁止されるかどうか"},{"key":"B","text":"サブコンテナーを作成できるかどうか"},{"key":"C","text":"コンテナー内のファイル一覧を取得できるかどうか"},{"key":"D","text":"匿名アクセスでの書き込み操作を許可するかどうか"}],"answer":["C"],"isMulti":false,"explanation":"匿名アクセスレベルの[BLOB]と[コンテナー]の違いは、コンテナー内のファイル一覧を取得できるかどうかです。[BLOB]の設定レベルではコンテナー内のファイル一覧を取得することはできませんが、[コンテナー]の設定レベルでは取得できます。[BLOB]と[コンテナー]では、共にインターネット経由での匿名アクセスが許可されます。ただし、匿名アクセスでは読み取りだけが許可されるため、どちらのレベルでも匿名アクセスによる書き込み操作は許可されません。また、Azure Blob Storageでは匿名アクセスレベルにかかわらず、サブコンテナーの作成自体ができません。"},{"id":53,"chapter":"第5章","qNum":4,"question":"あなたは、オンプレミスのHyper-V環境で作成したVHDファイルをAzure Blob Storageにアップロードし、それをAzure仮想マシンで使用したいと考えています。VHDファイルをAzure Blob Storageにアップロードする際、BLOBの種類として適切なものはどれですか。","choices":[{"key":"A","text":"ページBLOB"},{"key":"B","text":"追加BLOB"},{"key":"C","text":"ブロックBLOB"},{"key":"D","text":"ディスクBLOB"}],"answer":["A"],"isMulti":false,"explanation":"VHDファイルをアップロードしてAzure仮想マシンで使用する場合には、ページBLOBという種類でVHDファイルをアップロードする必要があります。それにより、アップロードしたVHDファイルからマネージドディスクまたはイメージを作成して仮想マシンで使用できます。ブロックBLOBは一般的なファイルや画像などの格納に適しており、追加BLOBは追加操作に最適化されています。ディスクBLOBという種類はありません。"},{"id":54,"chapter":"第5章","qNum":5,"question":"使用しているMicrosoft Azureの環境には、cont1という名前のAzure Blob Storageコンテナーがあります。あなたは、cont1内にブロックBLOBデータをアップロードしようとしています。アップロードしようとしているファイルは、今後ほぼアクセスされることはないと思われる過去の監査ログデータです。このファイルをアップロードする際のアクセス層として適切なものはどれですか。","choices":[{"key":"A","text":"クール"},{"key":"B","text":"リハイドレート"},{"key":"C","text":"アーカイブ"},{"key":"D","text":"ホット"}],"answer":["C"],"isMulti":false,"explanation":"ほぼアクセスされないデータを保管する場合は、アーカイブというアクセス層が適しています。アーカイブのストレージコストは非常に安く設定されています。ホットは頻繁にアクセスされるデータに適しており、クールはそれほど頻繁にはアクセスしないデータに適しています。リハイドレートは、アクセス層をアーカイブから他のアクセス層に切り替える操作およびプロセスを表すものであり、アクセス層の選択肢ではありません。"},{"id":55,"chapter":"第5章","qNum":6,"question":"あなたの組織では、次の要件を満たすストレージサービスの使用を計画しています。\n・SMB 3.0をサポートし、エクスプローラーを使用してデータにアクセスできる必要がある\n・ポート番号445を使用して接続する必要がある\n使用するストレージサービスの種類として適切なものはどれですか。","choices":[{"key":"A","text":"Azure Queue Storage"},{"key":"B","text":"Azure Files"},{"key":"C","text":"Azure Blob Storage"},{"key":"D","text":"Azure Table Storage"}],"answer":["B"],"isMulti":false,"explanation":"Azure FilesはSMB 3.0をサポートしており、エクスプローラーからアクセス可能です。また、Azure Filesのファイル共有への接続にはポート番号445が使用されます。その他のストレージの種類は、このシナリオの要件を満たしていません。"},{"id":56,"chapter":"第5章","qNum":7,"question":"Azure File Syncエージェントに関する説明として、誤っているものはどれですか。","choices":[{"key":"A","text":"エージェントがインストールされたサーバーはクラウドエンドポイントとなる"},{"key":"B","text":"マイクロソフトのダウンロードセンターからダウンロードできる"},{"key":"C","text":"オンプレミスのファイルサーバーにインストールするプログラムである"},{"key":"D","text":"ストレージ同期サービスへの登録を行うためにも使用される"}],"answer":["A"],"isMulti":false,"explanation":"クラウドエンドポイントはAzureファイル共有へのポインターとなるオブジェクトであり、Azure File Syncによって同期を行うAzureファイル共有の情報を保持しています。エージェントがインストールされたサーバーはストレージ同期サービスに登録済みサーバーとして登録され、サーバーエンドポイントの追加時に指定したディレクトリがAzureファイル共有と同期されます。"},{"id":57,"chapter":"第5章","qNum":8,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたはAzure File Syncの実装を計画しており、実装の手順を明確にしておく必要があります。Azure File Syncを実装するために必要な手順として適切なものはどれですか(4つ選択)。","choices":[{"key":"A","text":"同期グループとクラウドエンドポイントの作成"},{"key":"B","text":"サーバーエンドポイントの追加"},{"key":"C","text":"エージェントのインストールとサーバー登録"},{"key":"D","text":"ルートテーブルの作成"},{"key":"E","text":"Azure Storage Explorerのインストール"},{"key":"F","text":"ストレージ同期サービスのデプロイ"}],"answer":["A","B","C","F"],"isMulti":true,"explanation":"Azure File Syncを実装するには、最初にAzure上のリソースとしてストレージ同期サービスをデプロイします。次に、Windows ServerにAzure File Syncエージェントをインストールし、ストレージ同期サービスへのサーバー登録を行います。続いて、一連のファイル同期トポロジの定義となる同期グループを作成し、対象となるAzureファイル共有をクラウドエンドポイントとして指定します。なお、エージェントのインストールとサーバー登録の手順より前に、同期グループとクラウドエンドポイントを作成することも可能です。最後に、登録済みサーバーや同期するディレクトリパス情報を含むサーバーエンドポイントを追加します。ルートテーブルの作成とAzure Storage Explorerのインストールは、Azure File Syncの実装に必要な手順ではありません。"},{"id":58,"chapter":"第5章","qNum":9,"question":"Storage Service Encryptionによるストレージの暗号化において、カスタマーマネージドキーを選択時に使用されるキーストアサービスとして適切なものはどれですか。","choices":[{"key":"A","text":"Key Vault"},{"key":"B","text":"サービスエンドポイント"},{"key":"C","text":"Azure Blob Storage"},{"key":"D","text":"Shared Access Signature"}],"answer":["A"],"isMulti":false,"explanation":"Storage Service Encryption(SSE)では、Microsoftマネージドキーまたはカスタマーマネージドキーのいずれかを使用することができます。カスタマーマネージドキーを使用する場合、使用するキーはKey Vaultというサービスのキーコンテナーに格納して管理します。サービスエンドポイントは、特定の仮想ネットワークからのアクセスのみを許可したい場合などに使用される設定です。Azure Blob Storageは、非構造化データを格納するために最適化されたストレージサービスです。Shared Access Signatureは、クライアントがストレージアカウント内のリソースにアクセスする方法を制御できるセキュリティ機能です。これらはいずれも、キーストアサービスではありません。"},{"id":59,"chapter":"第6章","qNum":1,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、VNet1という仮想ネットワークがあります。VNet1には、Windows仮想マシンのVM1が接続されています。VM1のプライベートIPアドレスとして10.0.0.4という値が設定されていますが、この値を10.0.0.200に変更したいと考えています。行うべき操作として最も適切なものはどれですか。","choices":[{"key":"A","text":"VM1にRDP接続を行い、コントロールパネルからIPアドレスの設定を変更する"},{"key":"B","text":"VM1に関連付けられたネットワークインターフェイスで、割り当ての設定を[静的]に変更する"},{"key":"C","text":"VM1にRDP接続を行い、netshコマンドでIPアドレス設定を変更する"},{"key":"D","text":"VNet1のサブネットの設定を変更し、割り当てるアドレス範囲の開始番号を変更する"}],"answer":["B"],"isMulti":false,"explanation":"仮想マシンのプライベートIPアドレスを変更したい場合、その仮想マシンに関連付けられたネットワークインターフェイスで割り当ての設定を[静的]に変更し、IPアドレスを指定します。仮想ネットワークのサブネットにはアドレス範囲の設定はありますが、割り当てるアドレス範囲の開始番号などを指定することはできません。また、仮想マシンのOS内でIPアドレスを変更する操作は行うべきではありません。"},{"id":60,"chapter":"第6章","qNum":2,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたは仮想マシンを作成する予定ですが、その仮想マシンはWebサーバーとして構成し、インターネットからアクセスできる必要があります。行うべき操作として適切なものはどれですか。","choices":[{"key":"A","text":"InternetSubnetという名前のサブネットを作成し、仮想マシンを接続する"},{"key":"B","text":"仮想マシンの作成後に、プライベートIPアドレスの割り当て方法を[静的]に変更する"},{"key":"C","text":"パブリックIPアドレスを作成し、仮想マシンの作成時にパブリックIPアドレスとの関連付けを行う"},{"key":"D","text":"仮想マシンの作成時にプライベートIPアドレスを削除する"}],"answer":["C"],"isMulti":false,"explanation":"インターネットから仮想マシンにアクセスできるようにするには、パブリックIPアドレスが必要です。InternetSubnetという名前のサブネットに仮想マシンを接続したり、プライベートIPアドレスの割り当て方法を[静的]に変更しても、インターネットから仮想マシンにアクセスすることはできません。また、プライベートIPアドレスは必須のアドレスであるため、プライベートIPアドレスを削除することはできません。"},{"id":61,"chapter":"第6章","qNum":3,"question":"あなたは、ネットワークセキュリティグループ(NSG)を作成し、ネットワークトラフィックを制御しようと考えています。NSGの関連付け先として選択可能なものはどれですか(2つ選択)。","choices":[{"key":"A","text":"仮想ネットワーク"},{"key":"B","text":"サブネット"},{"key":"C","text":"ネットワークインターフェイス"},{"key":"D","text":"パブリックIPアドレス"}],"answer":["B","C"],"isMulti":true,"explanation":"NSGは、ネットワークインターフェイスまたはサブネットに関連付けて使用することができます。仮想ネットワークやパブリックIPアドレスへの関連付けはできません。"},{"id":62,"chapter":"第6章","qNum":4,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。Azure環境にはNSG1というネットワークセキュリティグループ(NSG)があり、NSG1では次のような受信セキュリティ規則が構成されています。\n[優先度100: Deny-HTTP / ポート80 / TCP / ソース:任意 / 宛先:任意 / アクション:拒否]\n[優先度200: Allow-HTTP / ポート80 / TCP / ソース:Internet / 宛先:任意 / アクション:許可]\n[優先度65000: AllowVnetInBound / 任意 / 任意 / Virtual Network / Virtual Network / 許可]\n[優先度65001: AllowAzureLoadBalancerInBound / 任意 / 任意 / Azure LoadBalancer / 任意 / 許可]\n[優先度65500: DenyAllInBound / 任意 / 任意 / 任意 / 任意 / 拒否]\nNSG1が使用される場合の受信トラフィックの動作の説明として適切なものはどれですか(2つ選択)。","choices":[{"key":"A","text":"インターネットからのHTTPトラフィックは許可される"},{"key":"B","text":"仮想ネットワークからのHTTPトラフィックは許可される"},{"key":"C","text":"送信元を問わず、すべてのHTTPトラフィックは拒否される"},{"key":"D","text":"インターネットからのRDPトラフィックは許可される"},{"key":"E","text":"仮想ネットワークからのRDPトラフィックは許可される"},{"key":"F","text":"送信元を問わず、すべてのRDPトラフィックは拒否される"}],"answer":["C","E"],"isMulti":true,"explanation":"NSGの規則は優先度順にチェックされます。ただし、より高い優先度の規則で指定した条件に一致した場合、その規則よりも低い優先度の規則は使用されません。HTTPのトラフィックについては、ソースが[任意]と指定されたDeny-HTTPの規則に一致するので、送信元を問わずにすべて拒否されます。RDPのトラフィックについては、ソースがインターネットである場合はDenyAllInBoundの規則によって拒否されますが、ソースが仮想ネットワークであればAllowVnetInBoundの規則によって許可されます。"},{"id":63,"chapter":"第6章","qNum":5,"question":"アプリケーションセキュリティグループ(ASG)に関する説明として、誤っているものはどれですか。","choices":[{"key":"A","text":"アプリケーションの通信パターンに合わせたNSG設定が容易になる"},{"key":"B","text":"同じ役割を持つ複数の仮想マシンのネットワークインターフェイスをグループ化できる"},{"key":"C","text":"ASGはNSGの規則の送信元および宛先として使用できる"},{"key":"D","text":"アプリケーション通信の暗号化を実装できる"}],"answer":["D"],"isMulti":false,"explanation":"ASGでは複数の仮想マシンのネットワークインターフェイスをグループ化して、NSGの規則の送信元および宛先として使用できます。それにより、アプリケーションの通信パターンに合わせたNSG設定が容易に実現できるというメリットがあります。ASGは、アプリケーション通信の暗号化を実装するためのものではありません。"},{"id":64,"chapter":"第6章","qNum":6,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。Azure環境で実行されるVM1という仮想マシンについて、インターネットから受信できるトラフィックをHTTPのみに制限したいと考えています。これを実現するための適切なソリューションはどれですか(2つ選択)。","choices":[{"key":"A","text":"ネットワークセキュリティグループ(NSG)"},{"key":"B","text":"ピアリング"},{"key":"C","text":"Azure Firewall"},{"key":"D","text":"アプリケーションセキュリティグループ(ASG)"}],"answer":["A","C"],"isMulti":true,"explanation":"NSGまたはAzure Firewallのいずれかを使用することで、インターネットから受信可能なトラフィックをHTTPのみに制限できます。NSGは仮想マシンのネットワークインターフェイスまたはサブネットに割り当てて通信制御するのに対し、Azure Firewallは異なるネットワーク間で行われる通信を一元的に制御するという違いがあります。ピアリングは異なる仮想ネットワーク間で通信ができるようにするための設定であり、ASGはアプリケーションの通信パターンに合わせたNSG設定を簡素化するために使用するものです。どちらも今回のシナリオでの使用は適していません。"},{"id":65,"chapter":"第6章","qNum":7,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたはドメインレジストラーから新しくcontoso.comというドメインを取得し、Azure DNSを使用してcontoso.comという名前のDNSゾーンを作成しました。あなたは、インターネット上でのcontoso.comの名前解決要求でDNSゾーン内の情報が参照されるように構成する必要があります。ドメインレジストラーに連絡すべき情報として最も適切なものはどれですか。","choices":[{"key":"A","text":"4つのネームサーバー"},{"key":"B","text":"4つのうちのいずれか2つのネームサーバー"},{"key":"C","text":"4つのうちのいずれか1つのネームサーバー"},{"key":"D","text":"ネームサーバー1として登録されたネームサーバー"}],"answer":["A"],"isMulti":false,"explanation":"Azure DNSゾーン内の情報がインターネット上の名前解決で使用されるためには委任が必要です。Azure DNSでは、障害の分離と復元性の向上のために各DNSゾーンに4つのネームサーバーが割り当てられるため、Azure DNSのSLAを満たすためには4つすべてのネームサーバーに委任する必要があります。"},{"id":66,"chapter":"第6章","qNum":8,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。また、Azure環境内にはVNet1という仮想ネットワークがあり、VNet1にはいくつかの仮想マシンが接続されています。あなたは、Azure DNSを使用して、次の要件を満たす環境を作成する必要があります。\n・VNet1内の仮想マシン同士で行われる通信で名前解決ができるようにする\n・管理負荷を抑えるために、仮想マシンのレコードは自動的に作成や変更が行われるようにする\n行うべき操作として最も適切なものはどれですか(2つ選択)。","choices":[{"key":"A","text":"VNet1を解決仮想ネットワークとして関連付ける"},{"key":"B","text":"VNet1を登録仮想ネットワークとして関連付ける"},{"key":"C","text":"プライベートDNSゾーンを作成する"},{"key":"D","text":"パブリック用のDNSゾーンを作成する"}],"answer":["B","C"],"isMulti":true,"explanation":"仮想ネットワーク内の仮想マシン同士の通信において名前解決を行いたい場合、プライベートDNSゾーンを作成する必要があります。また、プライベートDNSゾーン内の情報を使用して名前解決するには仮想ネットワークを関連付ける必要がありますが、仮想マシンのレコードを動的に登録するには登録仮想ネットワークとして関連付ける必要があります。解決仮想ネットワークとして関連付けた場合には、管理者は手動ですべてのレコードを管理する必要があります。パブリック用のDNSゾーンは、インターネット上の名前解決を目的として使用するものです。"},{"id":67,"chapter":"第7章","qNum":1,"question":"あなたはピアリングを使用し、Azure環境上に存在するいくつかの仮想ネットワークを接続する予定ですが、その前にピアリングによってどのような仮想ネットワークを接続できるかを特定する必要があります。ピアリングが構成可能な組み合わせとして適切なものはどれですか(2つ選択)。","choices":[{"key":"A","text":"同一サブスクリプション内に存在し、アドレス空間が異なる2つの仮想ネットワーク"},{"key":"B","text":"同一サブスクリプション内に存在し、アドレス空間が重複する2つの仮想ネットワーク"},{"key":"C","text":"異なるサブスクリプションに存在し、アドレス空間が異なる2つの仮想ネットワーク"},{"key":"D","text":"異なるサブスクリプションに存在し、アドレス空間が重複する2つの仮想ネットワーク"}],"answer":["A","C"],"isMulti":true,"explanation":"ピアリングによる仮想ネットワーク間の接続は、同一サブスクリプション内だけでなく、異なるサブスクリプションや異なるテナントでも構成可能です。ただし、アドレス空間が重複する2つの仮想ネットワークをピアリングで接続することはできません。"},{"id":68,"chapter":"第7章","qNum":2,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。Azure環境には、VNet1、VNet2、VNet3という3つの仮想ネットワークがあり、VNet1とVNet2の仮想ネットワーク間はピアリングによって接続が構成されています。また、Azure環境にはいくつかの仮想マシンも存在し、各仮想マシンは次のように仮想ネットワークに接続されています。\n[VM1: VNet1, VM2: VNet2, VM3: VNet3]\nあなたは、VM2とVM3、VM1とVM3がそれぞれプライベートIPアドレスで通信できるように構成する必要があります。なお、このシナリオではルーターなどを介さずに、2台の仮想マシンが直接通信できるようにする必要があるものとします。これらの要件を満たすように構成する場合、行うべき作業として最も適切なものはどれですか。","choices":[{"key":"A","text":"設定変更は不要"},{"key":"B","text":"VNet2とVNet3間を接続するピアリング設定"},{"key":"C","text":"VNet1とVNet3間を接続するピアリング設定"},{"key":"D","text":"VNet2とVNet3間を接続するピアリング設定と、VNet1とVNet3間を接続するピアリング設定の両方"}],"answer":["D"],"isMulti":false,"explanation":"このシナリオではVNet1とVNet2を接続するピアリングが有効になっていますが、ピアリングの設定は推移しないため、通信できるようにする2つの仮想ネットワーク間で明示的にピアリングを設定する必要があります。したがって、このシナリオの要件を満たすには、VNet2とVNet3間を接続するピアリング設定と、VNet1とVNet3間を接続するピアリング設定の両方が必要です。"},{"id":69,"chapter":"第7章","qNum":3,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。Azure環境には、VNet1とVNet2という2つの仮想ネットワークがあり、この仮想ネットワーク間はピアリングが構成されています。あなたは、これからVNet2上にVPNゲートウェイを作成しますが、そのVPNゲートウェイがVNet1からも使用できるようにピアリング設定を変更する必要があります。VNet2で構成されているピアリング設定について、オンにする必要があるチェックボックスとして適切なものはどれですか。","choices":[{"key":"A","text":"VNet2のリモートゲートウェイまたはルートサーバーを使用するためにVNet1を有効にする"},{"key":"B","text":"VNet1からのトラフィック転送の受信をVNet2に許可する"},{"key":"C","text":"VNet2からのトラフィック転送の受信をVNet1に許可する"},{"key":"D","text":"VNet2内のゲートウェイまたはルートサーバーにVNet1へのトラフィックの転送を許可する"}],"answer":["D"],"isMulti":false,"explanation":"VPNゲートウェイを共有するには、VPNゲートウェイを貸すための設定と、VPNゲートウェイを借りるための設定を各ピアリング設定で行う必要があります。このシナリオでは、VPNゲートウェイを貸し出す側の仮想ネットワークであるVNet2でのピアリングについて問われているため、VNet2で構成されたピアリング設定で[VNet2内のゲートウェイまたはルートサーバーにVNet1へのトラフィックの転送を許可する]のチェックボックスをオンにする必要があります。一方、VNet1のピアリング設定では、[VNet2のリモートゲートウェイまたはルートサーバーを使用するためにVNet1を有効にする]のチェックボックスをオンにする必要があります。トラフィック転送の受信の許可に関するチェックボックスは、ほかの仮想ネットワーク上に存在するルーターなどによって転送されたトラフィックを受け入れるかどうかの設定です。"},{"id":70,"chapter":"第7章","qNum":4,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。この環境内には、VM1という仮想マシンがあり、VM1に関連付けられたネットワークインターフェイスはVNet1のSubnet1に接続されています。あなたは、VM1が使用するルート情報を確認する必要があります。Azureポータルから確認する場合、どのリソースの管理画面を参照する必要がありますか。","choices":[{"key":"A","text":"仮想マシン"},{"key":"B","text":"仮想ネットワーク"},{"key":"C","text":"サブネット"},{"key":"D","text":"ネットワークインターフェイス"}],"answer":["D"],"isMulti":false,"explanation":"仮想マシンが使用するルート情報を確認するには、ネットワークインターフェイスの管理画面にある[ヘルプ]-[有効なルート]のメニューを使用します。仮想マシンや仮想ネットワークの管理画面からは、ルート情報を確認することはできません。また、サブネットの管理画面からは関連付けられたルートテーブルの確認や変更を行うことはできますが、ルート情報の内容を確認することはできません。"},{"id":71,"chapter":"第7章","qNum":5,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、あなたはこの環境内のネットワーク管理者です。環境内にはVNet1という仮想ネットワークがあり、VNet1にはいくつかのサブネットが構成されています。あなたは、このVNet1内のサブネット間の通信がネットワーク仮想アプライアンス(NVA)経由でルーティングされるように構成する必要があります。この要件を実現するために使用または変更するべきものとして最も適切なものはどれですか。","choices":[{"key":"A","text":"仮想ネットワークピアリング"},{"key":"B","text":"システムルート"},{"key":"C","text":"サービスエンドポイント"},{"key":"D","text":"ユーザー定義ルート"}],"answer":["D"],"isMulti":false,"explanation":"ユーザー定義ルートを使用することにより、仮想ネットワーク内のサブネット間の通信がネットワーク仮想アプライアンス(NVA)経由でルーティングされるように構成できます。仮想ネットワークピアリングは、異なる仮想ネットワーク間で通信を行うための設定です。システムルートには既定で使用されるルート情報が含まれており、その中ではサブネット間の通信が直接的に行われるよう定義されていますが、ユーザーがシステムルートを変更することはできません。サービスエンドポイントは、サブネット間のトラフィックを制御するものではなく、ストレージやSQL Databaseなどへの直接的なアクセスを実現するための設定です。"},{"id":72,"chapter":"第7章","qNum":6,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、あなたはこの環境内のネットワーク管理者です。環境内には、VM1という仮想マシンがあり、VM1に関連付けられたネットワークインターフェイスはVNet1のSubnet1に接続されています。あなたは、仮想ネットワーク内のトラフィックのフローを制御するために新しいルートテーブルを作成しました。あなたは、作成したルートテーブルがVM1で使用できるように構成する必要があります。ルートテーブルの関連付け先として適切なものはどれですか。","choices":[{"key":"A","text":"仮想マシン"},{"key":"B","text":"仮想ネットワーク"},{"key":"C","text":"サブネット"},{"key":"D","text":"ネットワークインターフェイス"}],"answer":["C"],"isMulti":false,"explanation":"作成したルートテーブルを使用するには、仮想ネットワークのサブネットへの関連付けが必要です。サブネットへの関連付けにより、そのサブネットに接続するネットワークインターフェイスおよび仮想マシンが、関連付けられたルートテーブルのルート情報を参照するようになります。仮想マシンや仮想ネットワーク、ネットワークインターフェイスに対してルートテーブルの関連付けを行うことはできません。"},{"id":73,"chapter":"第7章","qNum":7,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、環境内にはAzure SQL Databaseが構成されています。Azure SQL Databaseは同じリージョン内の仮想ネットワーク上の仮想マシンからのみアクセスされるため、このアクセスがAzureのバックボーンネットワーク上で最適化されたルートを介して行われるように構成し、インターネットを介したアクセスはブロックしたいと考えています。行うべき設定として適切なものはどれですか。","choices":[{"key":"A","text":"仮想ネットワークピアリング"},{"key":"B","text":"サービスエンドポイント"},{"key":"C","text":"仮想ネットワークゲートウェイ"},{"key":"D","text":"ロードバランサー"}],"answer":["B"],"isMulti":false,"explanation":"サービスエンドポイントを使用することで、重要なAzureサービスリソースへのアクセスを特定の仮想ネットワークのみに限定し、インターネットを介したアクセスはブロックできます。仮想ネットワークピアリングは、異なる仮想ネットワーク間で通信を行うための設定です。仮想ネットワークゲートウェイは、VPNによるサイト間接続などを行うためのサービスです。ロードバランサーは、複数の仮想マシンで負荷分散を行うためのサービスです。"},{"id":74,"chapter":"第7章","qNum":8,"question":"Private Linkのプライベートエンドポイントに関する説明として、誤っているものはどれですか。","choices":[{"key":"A","text":"ほかのリージョンで実行されるサービスへのプライベート接続ができる"},{"key":"B","text":"マップしたリソースにアクセスするためのパブリックIPアドレスを持つ"},{"key":"C","text":"ピアリングされたほかの仮想ネットワークやオンプレミスネットワークからも使用できる"},{"key":"D","text":"仮想ネットワークとサービスの間のトラフィックはAzureのバックボーンネットワークを経由して行われる"}],"answer":["B"],"isMulti":false,"explanation":"Private Linkのプライベートエンドポイントでは、マップしたリソースにアクセスするためのプライベートIPアドレスを持つことにより、仮想ネットワークからリソースへの直接アクセスを提供します。"},{"id":75,"chapter":"第8章","qNum":1,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたは環境内で構成する様々なサービスについて負荷分散を行う予定であり、そのために各負荷分散サービスの特徴を理解しておく必要があります。次のサービスのうち、レイヤー4(トランスポート層)のロードバランサーとして使用できる負荷分散サービスはどれですか。","choices":[{"key":"A","text":"Azure Application Gateway"},{"key":"B","text":"Azure Load Balancer"},{"key":"C","text":"仮想ネットワークゲートウェイ"},{"key":"D","text":"Azure Bastion"}],"answer":["B"],"isMulti":false,"explanation":"Azure Load Balancerは、レイヤー4のロードバランサーとして使用できる、最もポピュラーな負荷分散サービスです。ほかの負荷分散サービスには、レイヤー7のロードバランサーとして使用できるAzure Application Gatewayがあります。仮想ネットワークゲートウェイは、VPNによるサイト間接続などを行うためのサービスです。Azure Bastionは、仮想マシンへのリモート接続を提供するサービスです。これらは負荷分散サービスではありません。"},{"id":76,"chapter":"第8章","qNum":2,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、この環境内にはいくつかのアプリケーションサーバーの仮想マシンと、いくつかのデータベースサーバーの仮想マシンがあります。これらのすべての仮想マシンは同じ仮想ネットワークに接続されているものとします。あなたは、アプリケーションサーバーからデータベースサーバーへのアクセスについて負荷分散ができるようにAzure Load Balancerを構成します。使用するロードバランサーの種類として適切なものはどれですか。","choices":[{"key":"A","text":"ExpressRoute"},{"key":"B","text":"パブリック"},{"key":"C","text":"内部"},{"key":"D","text":"ハイブリッド"}],"answer":["C"],"isMulti":false,"explanation":"Azure Load Balancerの種類には、パブリックと内部の2種類があります。仮想ネットワーク内あるいはその仮想ネットワークに接続されたほかのネットワークからの通信について負荷分散したい場合には、内部ロードバランサーを使用します。一方、パブリックロードバランサーはパブリックIPアドレスを持ち、インターネットからの通信を負荷分散するために使用します。ExpressRouteとハイブリッドは、Azure Load Balancerの種類ではありません。"},{"id":77,"chapter":"第8章","qNum":3,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、環境内にはWebサーバーの役割を構成したいくつかの仮想マシンがあります。あなたは、パブリックのAzure Load Balancerを作成し、負荷分散規則によってWebサーバーへのアクセスを負荷分散できるように構成します。ただし、WebアプリではCookie情報を使用するため、アクセスのたびに負荷分散先が変わってしまうと問題が起きてしまいます。あるクライアントからのアクセスが同じ仮想マシンで処理されるように固定化するために、設定すべきものはどれですか。","choices":[{"key":"A","text":"セッション永続化"},{"key":"B","text":"インバウンドNAT規則"},{"key":"C","text":"バックエンドプール"},{"key":"D","text":"正常性プローブ"}],"answer":["A"],"isMulti":false,"explanation":"負荷分散規則でセッション永続化を構成することで、1つのクライアントからのアクセスが同じ仮想マシンで処理されるように振り分け先を固定化できます。これにより、Cookie情報を使用するWebアプリなどのように、アクセスのたびに振り分け先が変わると不都合となるシナリオに対応できます。インバウンドNAT規則は、ロードバランサーで受信したトラフィックを特定の仮想マシンにルーティングするために使用する規則であり、負荷分散のために使用するものではありません。また、バックエンドプールは負荷分散先となる仮想マシンのグループであり、正常性プローブはバックエンドプール内の死活監視を行うコンポーネントです。"},{"id":78,"chapter":"第8章","qNum":4,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、環境内にはWindows Serverを実行する3台の仮想マシン(VM1、VM2、VM3)があります。これらの仮想マシンにはインターネットからリモートデスクトップ接続を行う必要がありますが、パブリックのAzure Load Balancerを使用し、次の要件を満たすように構成したいと考えています。\n・外部ポートを隠蔽するために、ロードバランサーとターゲット仮想マシンで1対1のポート変換を行う\n・各仮想マシンにはパブリックIPアドレスを割り当てない\nこのシナリオを実現するために構成する必要がある規則の種類として適切なものはどれですか。","choices":[{"key":"A","text":"負荷分散規則"},{"key":"B","text":"正常性プローブ"},{"key":"C","text":"インバウンドNAT規則"},{"key":"D","text":"アウトバウンド規則"}],"answer":["C"],"isMulti":false,"explanation":"インバウンドNAT規則では、ロードバランサーの特定のポート番号宛の通信を、ターゲット仮想マシンの特定のポート番号宛に変換します。例えば、ロードバランサーのポート5001番宛に送られる通信をVM1のポート3389番宛とするようにポート変換できるため、外部ポートを隠蔽してセキュリティを向上できます。また、個々の仮想マシンにパブリックIPアドレスを割り当てる必要もなくなります。負荷分散規則は、負荷分散に使用する規則です。正常性プローブはバックエンドプール内の死活監視を行うコンポーネントであり、規則ではありません。アウトバウンド規則は、ロードバランサーのパブリックIPアドレスを使用したインターネット接続を、バックエンドプール内の仮想マシンに提供する場合に使用する規則です。"},{"id":79,"chapter":"第8章","qNum":5,"question":"Azure Application Gatewayの特徴や提供される機能に関する説明として、適切なものはどれですか(3つ選択)。","choices":[{"key":"A","text":"レイヤー7のロードバランサーとして使用できる"},{"key":"B","text":"任意のTCPまたはUDPプロトコルを指定して負荷分散できる"},{"key":"C","text":"負荷分散規則とインバウンドNAT規則を使用してインバウンド通信を制御する"},{"key":"D","text":"WebアプリケーションファイアウォールやSSLターミネーションが構成できる"},{"key":"E","text":"HTTPリクエストのURLパスやホストヘッダーで負荷分散できる"}],"answer":["A","D","E"],"isMulti":true,"explanation":"Azure Application Gatewayはレイヤー7のロードバランサーであり、Webサーバーの負荷分散に特化した負荷分散サービスとして使用できます。HTTPリクエストのURLパスやホストヘッダーなどの追加属性に基づいた負荷分散が可能で、WebアプリケーションファイアウォールやSSLターミネーションなどの高度な機能が含まれています。任意のTCPまたはUDPプロトコルを指定し、負荷分散規則とインバウンドNAT規則を使用してインバウンド通信を制御するのはAzure Load Balancerの特徴です。"},{"id":80,"chapter":"第8章","qNum":6,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。環境内にはWebサーバーの役割を構成したいくつかの仮想マシンがあります。あなたは、これらのWebサーバーへのアクセスについて負荷分散できるようにAzure Application Gatewayを使用します。ただし、HTTPリクエストのドメイン名に基づいて適切なサーバープールにルーティングされるように構成する必要があります。この要件を満たすために、Azure Application Gatewayを構成する際に必要となる操作はどれですか。","choices":[{"key":"A","text":"マルチサイトの種類のリスナーを選択する"},{"key":"B","text":"Webアプリケーションファイアウォールを有効化する"},{"key":"C","text":"パスベースの規則を構成する"},{"key":"D","text":"カスタムプローブを設定する"}],"answer":["A"],"isMulti":false,"explanation":"ドメイン名またはホスト名に基づいてルーティングを構成する場合には、マルチサイトの種類のリスナーを選択する必要があります。この操作により、HTTPリクエストのドメイン名に基づいて適切なサーバープールにルーティングされるように構成できます。一方、HTTPリクエストのURLパスに基づいてバックエンドの特定のサーバープールにトラフィックをルーティングしたい場合には、パスベースの規則を構成する必要があります。Webアプリケーションファイアウォールは、SQLインジェクション攻撃などの悪意のある攻撃から保護する機能であり、WAFのSKUでの構成時に有効になります。カスタムプローブは、死活監視のための正常性プローブのURLや間隔などを変更したい場合に使用するコンポーネントです。"},{"id":81,"chapter":"第8章","qNum":7,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。環境内にはWebサーバーの役割を構成したいくつかの仮想マシンがあります。あなたは、これらのWebサーバーへのアクセスについて負荷分散できるようにAppGW1という名前のアプリケーションゲートウェイを作成しますが、その前にAppGW1を配置するサブネットを特定しておく必要があります。AppGW1を配置できるサブネットとして適切なものはどれですか。","choices":[{"key":"A","text":"どのリソースも接続されていない「GatewaySubnet」という名前のサブネット"},{"key":"B","text":"Webサーバーの仮想マシンが接続された「SubnetA」という名前のサブネット"},{"key":"C","text":"Bastionリソースが接続された「AzureBastionSubnet」という名前のサブネット"},{"key":"D","text":"どのリソースも接続されていない「GWSubnet」という名前のサブネット"}],"answer":["D"],"isMulti":false,"explanation":"アプリケーションゲートウェイをデプロイするには、専用のサブネットが必要です。また、アプリケーションゲートウェイは「GatewaySubnet」や「AzureBastionSubnet」などのAzureの予約語が使用されたサブネットには配置できません。選択肢のうち、アプリケーションゲートウェイが配置可能なサブネットは、どのリソースも接続されていない「GWSubnet」という名前のサブネットのみです。"},{"id":82,"chapter":"第8章","qNum":8,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、サブスクリプション内にはVM1というAzure仮想マシンがあります。あなたは、VM1のネットワークインターフェイスに関連付けられたNSGのいくつかの規則を変更しましたが、この変更によりVM1から特定のリモートIPアドレス宛の通信ができなくなってしまいました。この問題をトラブルシューティングするために役立つNetwork Watcherの機能はどれですか。","choices":[{"key":"A","text":"IPフロー検証"},{"key":"B","text":"トポロジ"},{"key":"C","text":"ネクストホップ"},{"key":"D","text":"VPNのトラブルシューティング"}],"answer":["A"],"isMulti":false,"explanation":"NSGのトラブルシューティングを行うには、IPフロー検証が役立ちます。IPフロー検証の機能では、仮想マシンから送受信されるパケットのプロトコルや方向、任意のIPアドレス、ポート番号を指定し、NSGでの通信の可否をシミュレーションして、その結果の要因となるNSGのセキュリティ規則の名前を得られます。トポロジは、仮想ネットワーク内のすべてのリソースや関連付けられたリソースなどの関係性を視覚的に表示する機能です。ネクストホップは、ある仮想マシンから指定した宛先に対して通信が行われるときのネクストホップを確認できるため、ルートテーブルの動作確認やトラブルシューティングに役立ちます。VPNのトラブルシューティングは、仮想ネットワークゲートウェイやその接続をトラブルシューティングするための機能です。"},{"id":83,"chapter":"第8章","qNum":9,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、サブスクリプション内にはVM1というAzure仮想マシンがあります。あなたは、VM1が接続されているVNet1に対してフローログを作成しますが、その記録の保存場所を特定しておく必要があります。フローログが保存される場所として適切なものはどれですか。","choices":[{"key":"A","text":"Azure SQL Database"},{"key":"B","text":"VM1のローカルディスク"},{"key":"C","text":"ストレージアカウント"},{"key":"D","text":"OneDrive"}],"answer":["C"],"isMulti":false,"explanation":"フローログは、仮想ネットワークを通過するIPトラフィックに関する情報を記録するための機能です。フローログによって行われた記録は、ストレージアカウントにBLOBとして保存されます。そのため、記録された内容を参照するにはストレージアカウントへのアクセスが必要です。Azure SQL Databaseや仮想マシンのローカルディスク、OneDriveは、フローログが保存される場所として適切ではありません。"},{"id":84,"chapter":"第8章","qNum":10,"question":"Network Watcherを使用して仮想マシンのネットワークトラフィックをキャプチャする場合に、仮想マシンにインストールする必要があるものはどれですか。","choices":[{"key":"A","text":"Windows Azure Diagnostics(WAD)"},{"key":"B","text":"Network Watcherエージェント仮想マシン拡張機能"},{"key":"C","text":"Azure Monitorエージェント"},{"key":"D","text":"Microsoft Network Monitor"}],"answer":["B"],"isMulti":false,"explanation":"Network Watcherのほとんどの機能では拡張機能は不要ですが、パケットキャプチャなどのいくつかの機能を使用するにはNetwork Watcherエージェント仮想マシン拡張機能が必要です。拡張機能は事前にインストールしておくこともできますが、パケットキャプチャ機能を使用する場合はキャプチャ開始時に拡張機能が自動的にインストールされます。Windows Azure Diagnostics(WAD)とAzure Monitorエージェントは、パケットキャプチャを行うためではなく、ログやメトリックの監視データを収集するために必要なものです。Microsoft Network Monitorは、Network Watcherを用いたネットワークトラフィックのキャプチャには不要ですが、キャプチャファイルの内容を表示するために活用できるツールの1つです。"},{"id":85,"chapter":"第9章","qNum":1,"question":"App Serviceプランに関する説明として、誤っているものはどれですか。","choices":[{"key":"A","text":"Webアプリを動かすためのコンピューティング環境を提供するものである"},{"key":"B","text":"作成時にWindowsまたはLinuxのいずれかのOSを選択できる"},{"key":"C","text":"価格プランによって、コンピューティング環境の性能や機能が異なる"},{"key":"D","text":"1つのApp Serviceプランの上で、1つのWebアプリのみを実行することができる"}],"answer":["D"],"isMulti":false,"explanation":"1つのApp Serviceプランの上で、複数のWebアプリを実行することが可能です。そのため、必ずしもWebアプリごとに個別のApp Serviceプランを用意する必要はありません。ただし、1つのApp Serviceプランの上で多くのWebアプリを実行した結果、コンピューティング環境のリソースが不足するような場合は、別のApp Serviceプランを作成して使用します。"},{"id":86,"chapter":"第9章","qNum":2,"question":"App Serviceで提供される機能のうち、開発した新バージョンのWebアプリの確認や公開をスムーズに行うための機能はどれですか。","choices":[{"key":"A","text":"カスタムドメイン"},{"key":"B","text":"デプロイスロット"},{"key":"C","text":"自動スケール"},{"key":"D","text":"スケールアップ"}],"answer":["B"],"isMulti":false,"explanation":"デプロイスロットを使用すると、Webアプリの新バージョンの開発および確認とその公開をスムーズに行うことができます。例えば、運用スロットとは別に、ステージング用のスロットを追加できます。そして、追加したスロットで新バージョンのWebアプリを準備し、準備が完了したらスワップという操作によって2つのスロットの中身を入れ替えることができます。カスタムドメインは、既定のドメイン名ではなく、独自ドメインでアクセスできるようにするための機能です。自動スケールは、負荷の増減に合わせて自動的にインスタンス数を変更する機能です。スケールアップは、App Serviceプランの価格プランを変更する操作であり、機能ではありません。"},{"id":87,"chapter":"第9章","qNum":3,"question":"App Serviceのカスタムバックアップを行うために、作成する必要があるものはどれですか。","choices":[{"key":"A","text":"キーコンテナー"},{"key":"B","text":"Recovery Servicesコンテナー"},{"key":"C","text":"ストレージアカウント"},{"key":"D","text":"カスタムドメイン"}],"answer":["C"],"isMulti":false,"explanation":"App Serviceのカスタムバックアップを行うには、ストレージアカウントおよびBLOBコンテナーを作成する必要があります。キーコンテナーは、ディスクの暗号化に使用するキーやシークレット情報などを格納するために使用されます。Recovery Servicesコンテナーは、仮想マシンなどのバックアップデータの格納先です。カスタムドメインは、既定のドメイン名ではなく、独自ドメインでアクセスできるようにする機能です。"},{"id":88,"chapter":"第9章","qNum":4,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、次の表に示すApp Serviceプランがあります。\n[Plan1: 東日本 / RG1 / Standard]\n[Plan2: 西日本 / RG1 / Basic]\n[Plan3: 米国西部 / RG2 / Premium]\nあなたは、App1というApp ServiceのWebアプリを東日本リージョンに作成します。App1を作成時に選択可能なApp Serviceプランまたはその組み合わせとして適切なものはどれですか。","choices":[{"key":"A","text":"Plan1のみ"},{"key":"B","text":"Plan1とPlan2"},{"key":"C","text":"Plan1とPlan3"},{"key":"D","text":"すべてのApp Serviceプランが選択可能"}],"answer":["A"],"isMulti":false,"explanation":"事前に作成したApp Serviceプランを使用するには、App Serviceの作成時にApp Serviceプランと同じリージョンを選択する必要があります。そのため、このシナリオで選択可能なApp ServiceプランはPlan1だけです。"},{"id":89,"chapter":"第9章","qNum":5,"question":"Azure Container Instances(ACI)に関する説明として、誤っているものはどれですか。","choices":[{"key":"A","text":"Kubernetesによるコンテナーオーケストレーションが可能なDockerコンテナー実行環境を提供する"},{"key":"B","text":"PaaSサービスであり、数秒程度でコンテナーを開始できる"},{"key":"C","text":"コンテナーインスタンスの作成時に、CPUのコア数とメモリを指定できる"},{"key":"D","text":"WindowsコンテナーとLinuxコンテナーの両方をサポートしている"}],"answer":["A"],"isMulti":false,"explanation":"ACIは、Dockerコンテナーを実行するためのシンプルな環境を提供するサービスであり、高速かつ簡単にコンテナーを動かすことができます。Kubernetesによるコンテナーオーケストレーションが可能なDockerコンテナー実行環境を提供するサービスは、Azure Kubernetes ServiceやAzure Container Appsです。"},{"id":90,"chapter":"第9章","qNum":6,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたは、これからAzure Container Instances(ACI)でコンテナーインスタンスを作成し、Azureポータルでコンテナーインスタンスの管理画面のインターフェイスを確認しようとしています。ただし、現時点ではコンテナーイメージの作成やアップロードをしていないため、マイクロソフトによって提供されているサンプルのコンテナーイメージを使用します。この場合、イメージのソースとして最も適切な選択肢はどれですか。","choices":[{"key":"A","text":"Azure Container Registry"},{"key":"B","text":"Azure Compute Gallery"},{"key":"C","text":"クイックスタートイメージ"},{"key":"D","text":"その他のレジストリ"}],"answer":["C"],"isMulti":false,"explanation":"イメージのソースで[クイックスタートイメージ]を選択すると、マイクロソフトによって提供されているサンプルのコンテナーイメージを使用できます。[その他のレジストリ]を選択した場合でもコンテナーレジストリやイメージ名などを記述すればサンプルのイメージを取得できますが、[クイックスタートイメージ]のほうが簡単にサンプルイメージを選択できるため、このシナリオでは[クイックスタートイメージ]が最適解です。Azure Container Registryは、自身が作成したコンテナーイメージを保存して管理するためのプライベートレジストリサービスであり、サンプルのコンテナーイメージは含まれていません。Azure Compute Galleryは、コンテナーイメージのためのものではなく、仮想マシンイメージをほかのユーザーなどと共有するためのサービスです。"},{"id":91,"chapter":"第9章","qNum":7,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたは、Microsoft Azure上でコンテナーの実行環境を作成することを計画していますが、次の要件に適したコンテナーサービスを選択する必要があります。\n・マイクロサービスのアプリケーションを実行する\n・コンテナーオーケストレーションが必要\n・Kubernetesの知識を必要としない\n3つの要件のすべてを満たすために最も適したコンテナーサービスはどれですか。","choices":[{"key":"A","text":"Azure Kubernetes Service"},{"key":"B","text":"Azure Container Instances"},{"key":"C","text":"Azure Container Apps"},{"key":"D","text":"Azure Container Registry"}],"answer":["C"],"isMulti":false,"explanation":"このシナリオに最も適したコンテナーサービスはAzure Container Appsです。Azure Container Appsを使えば、マイクロサービスベースのアプリケーションのデプロイと管理を簡略化できます。また、内部的にはKubernetesなどのテクノロジが利用され、コンテナーオーケストレーションが行われますが、Kubernetesの知識がなくても扱うことができます。Azure Kubernetes Serviceを使用するには、Kubernetesに関する知識が必要です。Azure Container Instancesには、コンテナーオーケストレーションのための機能は含まれていません。Azure Container Registryは、作成したコンテナーイメージの保存や管理に使用するためのサービスであり、コンテナーを実行するサービスではありません。"},{"id":92,"chapter":"第10章","qNum":1,"question":"Azure Backupを使用して仮想マシンをバックアップする際に、最初に作成する必要があるAzureリソースはどれですか。","choices":[{"key":"A","text":"バックアップコンテナー"},{"key":"B","text":"Recovery Servicesコンテナー"},{"key":"C","text":"管理グループ"},{"key":"D","text":"キーコンテナー"}],"answer":["B"],"isMulti":false,"explanation":"Azure Backupを使用して仮想マシンをバックアップするには、最初にRecovery Servicesコンテナーを作成する必要があります。バックアップコンテナーは、仮想マシンではなく、AzureディスクやAzure Blob Storageのバックアップなどのために必要となるリソースです。管理グループは、複数のサブスクリプションをグループ化し、Azure Policyをまとめて適用する目的などに使用するものです。キーコンテナーは、Key Vaultのサービスによって、ストレージ暗号化に使用するキーや証明書などの情報を管理するために作成するリソースです。"},{"id":93,"chapter":"第10章","qNum":2,"question":"Azure Backupを使用し、オンプレミスで使用しているWindows OSを実行するコンピューターのファイルとフォルダーをバックアップしたいと考えています。このシナリオでAzure Backupを使用する上で必要となる手順はどれですか(3つ選択)。","choices":[{"key":"A","text":"コンテナー資格情報ファイルのダウンロード"},{"key":"B","text":"復旧計画を作成する"},{"key":"C","text":"MARSエージェントのダウンロードおよびインストール"},{"key":"D","text":"Recovery Servicesコンテナーの作成"},{"key":"E","text":"バックアップポリシーの作成"}],"answer":["A","C","D"],"isMulti":true,"explanation":"オンプレミスで使用するWindows OSコンピューターのファイルとフォルダーのバックアップのためにAzure Backupを使用する場合には、最初にRecovery Servicesコンテナーを作成します。さらに、このシナリオでは、MARSエージェントとコンテナー資格情報ファイルのダウンロードも必要です。コンテナー資格情報ファイルは、MARSエージェントのインストール後に指定する必要があります。復旧計画は、Azure Site Recoveryにおいて、複数の仮想マシンのフェールオーバーを確実に行うための機能です。バックアップポリシーは、仮想マシンの保護を行うシナリオでのバックアップの実行時刻などの構成情報です。"},{"id":94,"chapter":"第10章","qNum":3,"question":"Azure Backupを使用して、Azure仮想マシンのバックアップを行います。新しいバックアップポリシーを作成して毎日バックアップを実行しますが、できるだけ古いバックアップデータでの復元ができるように保有期間を構成したいと考えています。このシナリオにおいて、毎日のバックアップポイントの保有期間として設定すべき値はどれですか。","choices":[{"key":"A","text":"100"},{"key":"B","text":"999"},{"key":"C","text":"1000"},{"key":"D","text":"9999"}],"answer":["D"],"isMulti":false,"explanation":"毎日のバックアップポイントの保有期間は、最大で9,999日に設定できます。このシナリオでは、できるだけ古いバックアップデータでの復元ができるように保有期間を構成する必要があるため、最大の保有日数に設定するのが適切です。"},{"id":95,"chapter":"第10章","qNum":4,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたはAzure Backupを使用して、VM1という名前の仮想マシンのバックアップを実行しました。その後、誤ってVM1内の特定のフォルダーを削除してしまいました。あなたは、この削除されたフォルダーをバックアップデータから回復する必要があります。削除されたフォルダーの回復を行うための最も適切な操作はどれですか。","choices":[{"key":"A","text":"[VMの復元]を使用して、新しい仮想マシンを作成する"},{"key":"B","text":"[VMの復元]を使用して、既存の仮想マシンのディスクを置換する"},{"key":"C","text":"[ファイルの回復]を使用して、復元ポイントに含まれるディスクをマウントする"},{"key":"D","text":"[バックアップ項目]に表示されるフォルダーの一覧から選択して回復する"}],"answer":["C"],"isMulti":false,"explanation":"誤って仮想マシン内のフォルダーやファイルを削除してしまった場合は、[ファイルの回復]を使用し、復元ポイントに含まれるディスクをマウントして回復する操作が最も適切です。[VMの復元]は仮想マシンまたはそのディスクを復元するためのメニューであり、特定のフォルダーやファイルの回復のために使用するのは時間もコストもかかり最適とは言えません。また、既存のディスクを置換する場合は、仮想マシンに含まれるほかのデータに影響してしまう可能性も考えられます。仮想マシンのバックアップでは、[バックアップ項目]には仮想マシンの情報のみが表示され、ファイルやフォルダーの一覧などは表示されません。"},{"id":96,"chapter":"第10章","qNum":5,"question":"Azure Site Recoveryに関する説明として誤っているものはどれですか。","choices":[{"key":"A","text":"ビジネス継続性とディザスターリカバリーのためのサービスである"},{"key":"B","text":"仮想マシンとそのすべての関連リソースをレプリケーションできる"},{"key":"C","text":"Azure BackupよりもRPOとRTOが短い"},{"key":"D","text":"プライマリリージョンでの障害発生時は、セカンダリリージョンで速やかにワークロードを再開できる"}],"answer":["B"],"isMulti":false,"explanation":"Azure仮想マシンに対してAzure Site Recoveryを使用する場合、レプリケーションされるのは仮想マシンのディスクのみです。ネットワークインターフェイスや仮想ネットワークなどの関連リソースはレプリケーションされないため、セカンダリリージョンに別途作成する必要があります。実際にフェールオーバーが行われると、レプリケーションされたディスクと指定された関連リソースを基に仮想マシンが組み立てられ、実行されます。"},{"id":97,"chapter":"第10章","qNum":6,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、東日本リージョンで実行されるVM1という名前の仮想マシンがあります。あなたは、これからAzure Site Recoveryを使用し、VM1に対してレプリケーションを有効化します。レプリケーションを有効化する前に必要となる手順として適切なものはどれですか。","choices":[{"key":"A","text":"Recovery Servicesコンテナーを東日本リージョンに作成する"},{"key":"B","text":"Recovery Servicesコンテナーを西日本リージョンに作成する"},{"key":"C","text":"復旧計画を東日本リージョンに作成する"},{"key":"D","text":"復旧計画を西日本リージョンに作成する"}],"answer":["B"],"isMulti":false,"explanation":"Azure Site Recoveryを使用するには、最初にRecovery Servicesコンテナーを作成する必要があります。ただし、Azure仮想マシンのレプリケーションシナリオでは、Azure仮想マシンが存在しているリージョンとは異なるリージョンにRecovery Servicesコンテナーを作成する必要があります。復旧計画は、レプリケーションを有効化した後で必要に応じて作成するオプションです。また、リージョンを選択して作成するものではありません。"},{"id":98,"chapter":"第10章","qNum":7,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。サブスクリプション内にはSQL1とSQL2という名前の2つの仮想マシンがあり、この2つの仮想マシン上ではSQL Serverが実行されています。あなたはAzure Site Recoveryを使用し、この2つの仮想マシンに対してレプリケーションを有効にしますが、仮想マシン間での整合性を持たせる必要があります。この要件を満たすために行うべき操作として適切なものはどれですか。","choices":[{"key":"A","text":"レプリケーショングループを作成する"},{"key":"B","text":"テストフェールオーバーを実行する"},{"key":"C","text":"2つの仮想マシンで可用性セットを構成する"},{"key":"D","text":"ターゲット設定をカスタマイズする"}],"answer":["A"],"isMulti":false,"explanation":"Azure Site Recoveryでレプリケーションを行う際に複数の仮想マシン間で整合性が必要な場合には、レプリケーショングループを作成してマルチVM整合性を有効化します。マルチVM整合性を有効化することにより、同じレプリケーショングループ内のすべての仮想マシンはまとめてレプリケーションされ、フェールオーバー時にクラッシュ整合性とアプリ整合性の復旧ポイントを共有できます。テストフェールオーバーの実行は、フェールオーバーが適切に機能するかどうかや仮想マシンの動作を確認するための操作です。可用性セットは、仮想マシンの可用性オプションの1つであり、Azure Site Recoveryでの仮想マシン間の整合性を持たせるものではありません。ターゲット設定のカスタマイズは、セカンダリリージョンで使用するリソースグループや仮想ネットワークなどを指定するために行います。"},{"id":99,"chapter":"第10章","qNum":8,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたは、Azure Site Recoveryを使用して東日本リージョンのVM1という名前の仮想マシンのレプリケーションを有効化しました。セカンダリリージョンは西日本を使用します。その後、フェールオーバーおよびコミットを実行して、西日本リージョンでVM1を起動しました。あなたは、これ以降、西日本リージョンから東日本リージョンにVM1のレプリケーションが行われるように構成する必要があります。行うべき操作として適切なものはどれですか。","choices":[{"key":"A","text":"レプリケーションポリシーを変更する"},{"key":"B","text":"フェールバックを行う"},{"key":"C","text":"復旧計画を作成する"},{"key":"D","text":"再保護を行う"}],"answer":["D"],"isMulti":false,"explanation":"フェールオーバーおよびコミット後にレプリケーションの方向を反転させるには、再保護を行います。再保護により、セカンダリリージョンで起動された仮想マシンをプライマリリージョンにレプリケーションするよう構成できます。レプリケーションポリシーは復旧ポイントの保持期間などの構成情報の定義であり、レプリケーションの方向を反転するための設定は含まれていません。フェールバックは、再度フェールオーバーを実行することにより、プライマリリージョンでの仮想マシン実行に戻すための操作です。復旧計画は、複数の仮想マシンのフェールオーバーを確実に行うために作成するものです。"},{"id":100,"chapter":"第11章","qNum":1,"question":"Azureによって提供されるサービスのうち、Azureサービスの正常性やリソースの操作の記録、パフォーマンスの可視化などの監視を行うためのサービスはどれですか。","choices":[{"key":"A","text":"Azure Advisor"},{"key":"B","text":"RBAC"},{"key":"C","text":"Azure Policy"},{"key":"D","text":"Azure Monitor"}],"answer":["D"],"isMulti":false,"explanation":"Azure MonitorによりAzureサービス全体を監視し、Azureサービスの正常性やリソースの操作の記録、パフォーマンスの可視化などを行うことができます。Azure Advisorは、Azure環境およびそこに存在するリソースをスキャンしてアドバイスを提供する機能です。RBACは、リソースへのアクセス制御を行うための機能です。Azure Policyは、リソース作成時における選択可能なパラメーターの制限などを行うための機能です。"},{"id":101,"chapter":"第11章","qNum":2,"question":"Azure Monitorで収集されるデータの種類のうち、「仮想マシンのCPUの平均使用率の情報」や「ストレージアカウントで使用されている容量の情報」のように特定の時点におけるシステムの何らかの側面を表す数値データとなるものはどれですか。","choices":[{"key":"A","text":"ログ"},{"key":"B","text":"サブスクリプション"},{"key":"C","text":"メトリック"},{"key":"D","text":"クォータ"}],"answer":["C"],"isMulti":false,"explanation":"メトリックとは、特定の時点におけるシステムの何らかの側面を表す数値であり、簡単に言えばパフォーマンスデータです。メトリックを収集して様々な形式で可視化することで、時間経過による傾向の分析やほかのメトリックとの比較などに役立ちます。ログは、システム内で発生した操作や変化の記録であり、テキストまたは数値データとしてAzure Monitorに収集されます。サブスクリプションは、Azureを使用するための契約の単位です。クォータは、1つのサブスクリプション内で作成できるリソースの数などの上限設定です。"},{"id":102,"chapter":"第11章","qNum":3,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。あなたはAzure Monitorのアラートで条件指定を行い、アラートの発生時に特定のPowerShellスクリプトを自動実行してその対処を行いたいと考えています。この内容を実現するために、アクショングループの作成時における操作として最も適切なものはどれですか。","choices":[{"key":"A","text":"[通知]タブで、[電子メール]を選択する"},{"key":"B","text":"[アクション]タブで、[Automation Runbook]を選択する"},{"key":"C","text":"[アクション]タブで、[Azure関数(Function)]を選択する"},{"key":"D","text":"[アクション]タブで、[PowerShellスクリプト]を選択する"}],"answer":["B"],"isMulti":false,"explanation":"アラートの発生時に特定のPowerShellまたはPythonスクリプトを自動的に実行してその対処を行いたい場合は、アクショングループの作成時に[アクション]タブで[Automation Runbook]を選択します。[通知]タブは、電子メールやSMSによる通知を行いたい場合に構成するタブです。[アクション]タブの[Azure関数(Function)]は、関数アプリを実行するための選択肢です。[アクション]タブには、[PowerShellスクリプト]という選択肢はありません。"},{"id":103,"chapter":"第11章","qNum":4,"question":"Azure Monitorのアラートにおいて、一定時間内に多くのアラートが発生する場合に、その通知の数を自動的に抑制するための仕組みはどれですか。","choices":[{"key":"A","text":"クォータ"},{"key":"B","text":"シグナル"},{"key":"C","text":"重大度"},{"key":"D","text":"レート制限"}],"answer":["D"],"isMulti":false,"explanation":"Azure Monitorのアラート通知にはレート制限があり、一定時間内のアラートの通知の数が自動的に抑制されます。例えば、電子メールには1時間で100件以下というレート制限が設定されています。クォータは、1つのサブスクリプション内で作成できるリソースの数などの上限設定です。シグナルは、リソースから出力される信号を表し、アラートの条件指定を行う際に選択するパラメーターです。重大度は、アラートルールによって発生するアラートの重大度を示すパラメーターであり、多数のアラートが出ているときに優先的に着手すべきアラートを判断するために使用するものです。"},{"id":104,"chapter":"第11章","qNum":5,"question":"Log Analyticsを使用して監視データの収集や分析を行う場合に、最初に作成する必要があるものはどれですか。","choices":[{"key":"A","text":"Log Analyticsワークスペース"},{"key":"B","text":"コンテナー"},{"key":"C","text":"ストレージアカウント"},{"key":"D","text":"テーブル"}],"answer":["A"],"isMulti":false,"explanation":"Log Analyticsワークスペースとは、Log Analyticsによって分析するデータの保存場所となるリソースです。Log Analyticsを使用して分析を行うには、その分析対象となるデータを1つの場所に集める必要があるため、最初にLog Analyticsワークスペースを作成します。Log Analyticsを使用するために、コンテナー、ストレージアカウント、テーブルを作成する必要はありません。"},{"id":105,"chapter":"第11章","qNum":6,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあり、サブスクリプション内にはLinuxを実行するVM1というAzure仮想マシンがあります。あなたは、Log Analyticsを使用してVM1を監視する予定です。ゲストOSの監視データをLog Analyticsワークスペースに送信するために、VM1にインストールすべきものとして適切なものはどれですか。","choices":[{"key":"A","text":"Windows Azure Diagnostics(WAD)"},{"key":"B","text":"Linux Azure Diagnostics(LAD)"},{"key":"C","text":"Azure Monitorエージェント"},{"key":"D","text":"Application Insights"}],"answer":["C"],"isMulti":false,"explanation":"Azure Monitorエージェントは、監視対象のマシンのOSとワークロードから監視データを収集してLog Analyticsワークスペースに送信するためのエージェントです。したがって、Log Analyticsの監視対象のマシンにはAzure Monitorエージェントをインストールする必要があります。なお、データ収集ルールの構成時に指定したリソースには、Azure Monitorエージェントが自動的にインストールされます。Windows Azure Diagnostics(WAD)とLinux Azure Diagnostics(LAD)では監視データの送信先はストレージアカウントやAzure Event Hubsとなり、Log Analyticsワークスペースには送信できません。Application Insightsは、アプリケーション監視のためのサービスです。"},{"id":106,"chapter":"第11章","qNum":7,"question":"あなたが使用するMicrosoft Azure環境には1つのサブスクリプションがあります。サブスクリプション内にはWindowsを実行する仮想マシンがあり、Log Analyticsによる監視を行っています。あなたは、Log AnalyticsワークスペースにLog Analyticsワークスペースに格納された監視データからWindowsイベントログを分析します。Windowsイベントログから文字列「error」を含むイベントだけを検索したい場合、これを実行するクエリとして適切なものはどれですか。","choices":[{"key":"A","text":"Get-EventLog -LogName system | ?{$_.EntryType -eq \"error\"}"},{"key":"B","text":"search in (Event) \"error\""},{"key":"C","text":"Select * from Event where EventType == \"error\""},{"key":"D","text":"Event | where EventType == \"error\""}],"answer":["B"],"isMulti":false,"explanation":"Windowsイベントログから「error」という文字列を含むイベントだけを検索したい場合は、「Event | search \"error\"」または「search in (Event) \"error\"」というクエリで実行可能です。Get-EventLogは、Windows PowerShellによりイベントログを取得するためのコマンドレットであり、KQLのクエリとしては実行できません。ほかの選択肢もKQLのクエリとして不適切であり、実行できません。"}];
+
+let state = {
+  order: [],
+  currentIndex: 0,
+  selected: [],
+  answered: false,
+  results: []
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  state = {
+    order: shuffle(QUIZ_DATA.map(q => q.id)),
+    currentIndex: 0,
+    selected: [],
+    answered: false,
+    results: []
+  };
+  renderQuestion();
+}
+
+function currentQuestion() {
+  const id = state.order[state.currentIndex];
+  return QUIZ_DATA.find(q => q.id === id);
+}
+
+function renderQuestion() {
+  const q = currentQuestion();
+  const total = state.order.length;
+  const progress = ((state.currentIndex) / total) * 100;
+  const inputType = q.isMulti ? 'checkbox' : 'radio';
+
+  const choicesHtml = q.choices.map(c => `
+    <label class="choice" data-key="${c.key}">
+      <input type="${inputType}" name="choice" value="${c.key}">
+      <span class="choice-key">${c.key}.</span>
+      <span class="choice-text">${escapeHtml(c.text)}</span>
+    </label>
+  `).join('');
+
+  const multiBadge = q.isMulti ? '<span class="multi-badge">複数選択</span>' : '';
+
+  document.getElementById('app').innerHTML = `
+    <header>
+      <h1>AZ-104 対策クイズ</h1>
+      <div class="progress-wrap">
+        <span>${state.currentIndex + 1} / ${total}</span>
+        <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
+      </div>
+    </header>
+    <div class="card">
+      <span class="chapter-tag">${escapeHtml(q.chapter)} 問${q.qNum}</span>${multiBadge}
+      <div class="question-text">${escapeHtml(q.question)}</div>
+      <div class="choices" id="choices">${choicesHtml}</div>
+      <div id="action-area" style="text-align: center;">
+        <button class="submit-btn" id="submit-btn" disabled>回答</button>
+      </div>
+      <div id="feedback-area"></div>
+    </div>
+  `;
+
+  // イベント
+  const inputs = document.querySelectorAll('#choices input');
+  inputs.forEach(input => {
+    input.addEventListener('change', () => {
+      if (q.isMulti) {
+        state.selected = Array.from(document.querySelectorAll('#choices input:checked')).map(i => i.value);
+      } else {
+        state.selected = [input.value];
+      }
+      document.getElementById('submit-btn').disabled = state.selected.length === 0;
+    });
+  });
+
+  document.getElementById('submit-btn').addEventListener('click', submitAnswer);
+}
+
+function submitAnswer() {
+  const q = currentQuestion();
+  const userAns = [...state.selected].sort();
+  const correctAns = [...q.answer].sort();
+  const isCorrect = userAns.length === correctAns.length && userAns.every((v, i) => v === correctAns[i]);
+
+  state.results.push({
+    qId: q.id,
+    userAnswer: userAns,
+    correct: isCorrect
+  });
+
+  // 選択肢のスタイル更新 & ロック
+  document.querySelectorAll('#choices .choice').forEach(label => {
+    const key = label.dataset.key;
+    label.classList.add('locked');
+    label.querySelector('input').disabled = true;
+    if (correctAns.includes(key)) {
+      label.classList.add('correct');
+    } else if (userAns.includes(key)) {
+      label.classList.add('incorrect');
+    }
+  });
+
+  // ボタンエリアを「次へ」に変更
+  const isLast = state.currentIndex === state.order.length - 1;
+  document.getElementById('action-area').innerHTML = `
+    <button class="next-btn" id="next-btn">${isLast ? '結果を見る' : '次の問題へ'}</button>
+  `;
+  document.getElementById('next-btn').addEventListener('click', nextQuestion);
+
+  // フィードバック表示
+  const correctText = correctAns.join('、');
+  const userText = userAns.join('、');
+  document.getElementById('feedback-area').innerHTML = `
+    <div class="feedback ${isCorrect ? 'correct' : 'incorrect'}">
+      <div class="feedback-title">${isCorrect ? '✓ 正解' : '✗ 不正解'}</div>
+      <div class="feedback-answer">正解: ${correctText}${!isCorrect ? `<span style="color:#d33b3b; margin-left:12px;">あなたの回答: ${userText}</span>` : ''}</div>
+      <div class="feedback-explanation">${escapeHtml(q.explanation)}</div>
+    </div>
+  `;
+
+  state.answered = true;
+}
+
+function nextQuestion() {
+  state.currentIndex++;
+  state.selected = [];
+  state.answered = false;
+  if (state.currentIndex >= state.order.length) {
+    renderSummary();
+  } else {
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function renderSummary() {
+  const total = state.results.length;
+  const correctCount = state.results.filter(r => r.correct).length;
+  const percent = Math.round((correctCount / total) * 100);
+  const wrong = state.results.filter(r => !r.correct);
+
+  const wrongHtml = wrong.length === 0
+    ? '<div class="empty-wrong">🎉 全問正解です！</div>'
+    : wrong.map(r => {
+        const q = QUIZ_DATA.find(qq => qq.id === r.qId);
+        const choicesHtml = q.choices.map(c => {
+          let cls = 'normal';
+          if (q.answer.includes(c.key)) cls = 'correct';
+          else if (r.userAnswer.includes(c.key)) cls = 'user-wrong';
+          return `<div class="wrong-choice ${cls}"><strong>${c.key}.</strong> ${escapeHtml(c.text)}</div>`;
+        }).join('');
+        return `
+          <div class="wrong-item">
+            <div class="wrong-q-meta">${escapeHtml(q.chapter)} 問${q.qNum}</div>
+            <div class="wrong-q-text">${escapeHtml(q.question)}</div>
+            ${choicesHtml}
+            <div class="wrong-answers-line">
+              <strong>正解: ${q.answer.join('、')}</strong>
+              <span class="wrong-user-line" style="margin-left:14px;">あなたの回答: ${r.userAnswer.join('、') || '(未回答)'}</span>
+            </div>
+            <div class="wrong-explanation">${escapeHtml(q.explanation)}</div>
+          </div>
+        `;
+      }).join('');
+
+  document.getElementById('app').innerHTML = `
+    <header>
+      <h1>AZ-104 対策クイズ - 結果</h1>
+    </header>
+    <div class="card summary-score">
+      <div class="score-percent">${percent}%</div>
+      <div class="score-detail">${total}問中 ${correctCount}問 正解</div>
+      <div class="summary-buttons">
+        <button class="primary-btn" id="restart-btn">もう一度</button>
+        <button class="secondary-btn" id="end-btn">終了する</button>
+      </div>
+    </div>
+    <div class="wrong-section">
+      <h2>間違えた問題 (${wrong.length}問)</h2>
+      ${wrongHtml}
+    </div>
+  `;
+
+  document.getElementById('restart-btn').addEventListener('click', startQuiz);
+  document.getElementById('end-btn').addEventListener('click', endQuiz);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function endQuiz() {
+  document.getElementById('app').innerHTML = `
+    <header><h1>AZ-104 対策クイズ</h1></header>
+    <div class="card" style="text-align:center; padding: 50px 20px;">
+      <div style="font-size: 1.2rem; color:#0a4d8a; margin-bottom: 20px;">お疲れさまでした。</div>
+      <button class="primary-btn" onclick="startQuiz()">最初からやり直す</button>
+    </div>
+  `;
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+startQuiz();
+</script>
+</body>
+</html>
